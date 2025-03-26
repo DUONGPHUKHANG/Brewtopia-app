@@ -1,5 +1,6 @@
 const authService = require("../services/authService");
 const User = require("../models/User");
+const setCookie = require("../utils/setCookie");
 
 // Đăng ký tài khoản
 const register = async (req, res) => {
@@ -21,12 +22,6 @@ const register = async (req, res) => {
 
     res.status(201).json({
       message: "Đăng ký thành công! Vui lòng kiểm tra email để xác thực.",
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
     });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -40,14 +35,7 @@ const login = async (req, res) => {
     if (!user) return res.status(401).json({ message: "User not found" });
 
     const token = authService.generateToken(user);
-
-    // **Lưu token vào cookies đúng cách**
-    res.cookie("token", token, {
-      httpOnly: true, // Chặn JavaScript đọc cookie (bảo mật)
-      secure: process.env.NODE_ENV === "production", // Chỉ hoạt động trên HTTPS nếu production
-      sameSite: "Strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-    });
+    setCookie(res, token);
     res.status(200).json({ status: "success", token, user });
   } catch (error) {
     console.error(error);
@@ -55,17 +43,15 @@ const login = async (req, res) => {
   }
 };
 
-// Xác thực tài khoản bằng email + mã xác thực
 const verifyUser = async (req, res) => {
   try {
-    const { email, code } = req.body; // Người dùng chỉ cần nhập email + code
+    const { email, code } = req.body;
     const user = await authService.verifyUserByEmail(email, code);
     res.status(200).json({
       message: "Tài khoản đã được xác thực thành công!",
       user: {
         _id: user._id,
         name: user.name,
-        email: user.email,
         isVerified: user.isVerified,
       },
     });
@@ -105,48 +91,26 @@ const resetPassword = async (req, res) => {
 
 const googleLogin = async (req, res) => {
   try {
-    const { displayName, emails, photos, provider } = req.user;
-
-    const { user, token } = await authService.socialLogin({
-      name: displayName,
-      email: emails[0].value,
-      avatar: photos[0].value,
-      provider,
-    });
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
+    const user = req.user;
+    // Tạo token
+    const token = authService.generateToken(user);
+    setCookie(res, token);
     res.status(200).json({ status: "success", token, user });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Lỗi server" });
   }
 };
 
 const facebookLogin = async (req, res) => {
   try {
-    const { displayName, emails, photos, provider } = req.user;
-
-    const { user, token } = await authService.socialLogin({
-      name: displayName,
-      email: emails[0].value,
-      avatar: photos[0].value,
-      provider,
-    });
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
+    const user = req.user;
+    // Tạo token
+    const token = authService.generateToken(user);
+    setCookie(res, token); // Đặt cookie
     res.status(200).json({ status: "success", token, user });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Lỗi server" });
   }
 };

@@ -3,7 +3,10 @@ const http = require("http");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const socketHandlers = require("./socket.io/index"); // Gọi đúng file index.js của socket.io
+const socketHandlers = require("./socket.io/index");
+const session = require("express-session");
+require("./config/passport");
+const passport = require("passport");
 
 require("dotenv").config();
 
@@ -29,6 +32,16 @@ app.use((req, res, next) => {
   req.io = io;
   next();
 });
+// Cấu hình session
+app.use(
+  session({
+    secret: `${process.env.SESSION_SECRET}`,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+app.use(passport.initialize()); // Phải có dòng này
+app.use(passport.session());
 
 // Import Routes
 app.use("/api/auth", require("./routes/authRoutes"));

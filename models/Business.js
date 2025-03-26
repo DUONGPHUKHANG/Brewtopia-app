@@ -13,13 +13,13 @@ const BusinessSchema = new mongoose.Schema(
       ward: String,
       district: String,
       city: String,
-      coordinates: { type: [Number], required: true }, // [longitude, latitude]
+      coordinates: { type: [Number], required: true },
     },
     email: { type: String, required: true },
     phoneNumber: { type: String, required: true },
     menu: [
       {
-        category: String, // VD: "Fruit Drinks"
+        category: String,
         items: [{ name: String, price: Number, image: String }],
       },
     ],

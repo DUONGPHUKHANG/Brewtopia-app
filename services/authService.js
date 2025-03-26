@@ -73,7 +73,7 @@ const verifyUserByEmail = async (email, code) => {
 
 const generateToken = (user) => {
   return jwt.sign(
-    { email: user.email, id: user.id, role: user.role },
+    { email: user.email, id: user.id, role: user.role || "user" },
     process.env.JWT_SECRET_KEY,
     { expiresIn: "7d" }
   );
@@ -140,25 +140,7 @@ const resetPassword = async (email, token, newPassword) => {
 
   return { message: "Mật khẩu đã được cập nhật!" };
 };
-const socialLogin = async ({ name, email, avatar, provider }) => {
-  let user = await User.findOne({ email });
 
-  if (!user) {
-    // Nếu user chưa tồn tại, tạo mới
-    user = await User.create({
-      name,
-      email,
-      avatar,
-      provider,
-      isVerified: true, // Đăng nhập bằng Google/Facebook mặc định là xác thực
-    });
-  }
-
-  // Tạo token
-  const token = generateToken(user);
-
-  return { user, token };
-};
 module.exports = {
   registerUser,
   loginUser,
@@ -168,5 +150,4 @@ module.exports = {
   generateToken,
   forgotPassword,
   resetPassword,
-  socialLogin,
 };
