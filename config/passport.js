@@ -63,14 +63,15 @@ if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
 
           if (!user) {
             user = new User({
+              id,
               name: displayName,
               email,
               avatar,
               provider: "facebook",
+              isVerified: true,
             });
             await user.save();
           }
-
           return done(null, user);
         } catch (error) {
           return done(error);

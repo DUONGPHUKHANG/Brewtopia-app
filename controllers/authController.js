@@ -68,21 +68,12 @@ const resendVerificationCode = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
-const forgotPassword = async (req, res) => {
-  try {
-    const { email } = req.body;
-    const response = await authService.forgotPassword(email);
-    res.status(200).json(response);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
 
 // Đặt lại mật khẩu bằng token
 const resetPassword = async (req, res) => {
   try {
-    const { email, token, newPassword } = req.body;
-    const response = await authService.resetPassword(email, token, newPassword);
+    const { token, newPassword } = req.body;
+    const response = await authService.resetPassword(token, newPassword);
     res.status(200).json(response);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -114,6 +105,25 @@ const facebookLogin = async (req, res) => {
     res.status(500).json({ message: "Lỗi server" });
   }
 };
+
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: "Vui lòng nhập email!" });
+    }
+
+    // Gọi service để tạo token và gửi email
+    const response = await authService.sendResetPasswordEmail(email);
+    res
+      .status(200)
+      .json({ message: "Email đặt lại mật khẩu đã được gửi!", response });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   register,
   login,
