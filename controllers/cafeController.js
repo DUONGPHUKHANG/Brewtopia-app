@@ -58,6 +58,21 @@ const getCafesNearby = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+const getCafeMenu = async (req, res) => {
+  try {
+    const { cafeId } = req.params;
+
+    const menu = await cafeService.getCafeMenu(cafeId);
+    if (!menu) {
+      return res.status(404).json({ message: "Quán cafe không tồn tại" });
+    }
+
+    res.status(200).json({ menu });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server", error: error.message });
+  }
+};
+
 module.exports = {
   createCafe,
   getCafes,
@@ -65,4 +80,5 @@ module.exports = {
   updateCafe,
   deleteCafe,
   getCafesNearby,
+  getCafeMenu,
 };

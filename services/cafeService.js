@@ -160,6 +160,15 @@ const updateCafeRating = async (cafeId) => {
     throw new Error("Lỗi khi cập nhật rating: " + err.message);
   }
 };
+const getCafeMenu = async (cafeId) => {
+  try {
+    const cafe = await Cafe.findById(cafeId).populate("menu");
+    if (!cafe) return null;
+    return cafe.menu;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
 
 module.exports = {
   createCafe,
@@ -169,4 +178,5 @@ module.exports = {
   deleteCafe,
   getCafesNearby,
   updateCafeRating,
+  getCafeMenu,
 };

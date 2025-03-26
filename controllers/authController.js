@@ -82,9 +82,81 @@ const resendVerificationCode = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const response = await authService.forgotPassword(email);
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Đặt lại mật khẩu bằng token
+const resetPassword = async (req, res) => {
+  try {
+    const { email, token, newPassword } = req.body;
+    const response = await authService.resetPassword(email, token, newPassword);
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const googleLogin = async (req, res) => {
+  try {
+    const { displayName, emails, photos, provider } = req.user;
+
+    const { user, token } = await authService.socialLogin({
+      name: displayName,
+      email: emails[0].value,
+      avatar: photos[0].value,
+      provider,
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({ status: "success", token, user });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
+
+const facebookLogin = async (req, res) => {
+  try {
+    const { displayName, emails, photos, provider } = req.user;
+
+    const { user, token } = await authService.socialLogin({
+      name: displayName,
+      email: emails[0].value,
+      avatar: photos[0].value,
+      provider,
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({ status: "success", token, user });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
 module.exports = {
   register,
   login,
   verifyUser,
   resendVerificationCode,
+  forgotPassword,
+  resetPassword,
+  googleLogin,
+  facebookLogin,
 };

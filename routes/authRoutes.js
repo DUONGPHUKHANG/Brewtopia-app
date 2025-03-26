@@ -4,6 +4,10 @@ const {
   register,
   login,
   verifyUser,
+  forgotPassword,
+  resetPassword,
+  googleLogin,
+  facebookLogin,
 } = require("../controllers/authController");
 
 const router = express.Router();
@@ -12,6 +16,8 @@ router.post("/register", register);
 router.post("/login", login);
 router.post("/verification", verifyUser);
 router.post("/resend-verification", verifyUser);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 router.get(
   "/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
@@ -19,9 +25,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", { session: false }),
-  (req, res) => {
-    res.json({ token: req.user.token });
-  }
+  googleLogin
 );
 router.get(
   "/facebook",
@@ -30,9 +34,7 @@ router.get(
 router.get(
   "/facebook/callback",
   passport.authenticate("facebook", { session: false }),
-  (req, res) => {
-    res.json({ token: req.user.token });
-  }
+  facebookLogin
 );
 
 module.exports = router;

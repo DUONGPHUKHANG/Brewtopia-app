@@ -73,13 +73,11 @@ const verifyUserByEmail = async (email, code) => {
 
 const generateToken = (user) => {
   return jwt.sign(
-    { email: user.email, id: user.id, role: user.role }, // ✅ Thêm role
+    { email: user.email, id: user.id, role: user.role },
     process.env.JWT_SECRET_KEY,
     { expiresIn: "7d" }
   );
 };
-
-module.exports = { generateToken };
 // Service gửi lại mã xác thực
 const resendVerificationCodeService = async (userId) => {
   const user = await User.findById(userId);
@@ -90,6 +88,77 @@ const resendVerificationCodeService = async (userId) => {
 
   return sendVerificationEmail(user);
 };
+
+const forgotPassword = async (email) => {
+  const user = await User.findOne({ email });
+  if (!user) throw new Error("Email không tồn tại!");
+
+  // Tạo token đặt lại mật khẩu (random string)
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  // Mã hóa token trước khi lưu vào database
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // Lưu token vào user và đặt thời gian hết hạn (15 phút)
+  user.resetPasswordToken = hashedToken;
+  user.resetPasswordExpiresAt = Date.now() + 15 * 60 * 1000; // 15 phút
+  await user.save();
+
+  // Gửi email reset password
+  const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}&email=${email}`;
+  await sendEmail(
+    user.email,
+    `Bấm vào link để đặt lại mật khẩu: ${resetLink}`,
+    user.name
+  );
+
+  return { message: "Đã gửi email đặt lại mật khẩu!", resetLink };
+};
+
+const resetPassword = async (email, token, newPassword) => {
+  const user = await User.findOne({ email });
+  if (!user) throw new Error("Email không tồn tại!");
+
+  // Mã hóa token để so sánh với database
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  if (
+    user.resetPasswordToken !== hashedToken ||
+    user.resetPasswordExpiresAt < Date.now()
+  ) {
+    throw new Error("Token không hợp lệ hoặc đã hết hạn!");
+  }
+
+  // Cập nhật mật khẩu mới
+  user.password = await bcrypt.hash(newPassword, 10);
+  user.resetPasswordToken = null;
+  user.resetPasswordExpiresAt = null;
+  await user.save();
+
+  return { message: "Mật khẩu đã được cập nhật!" };
+};
+const socialLogin = async ({ name, email, avatar, provider }) => {
+  let user = await User.findOne({ email });
+
+  if (!user) {
+    // Nếu user chưa tồn tại, tạo mới
+    user = await User.create({
+      name,
+      email,
+      avatar,
+      provider,
+      isVerified: true, // Đăng nhập bằng Google/Facebook mặc định là xác thực
+    });
+  }
+
+  // Tạo token
+  const token = generateToken(user);
+
+  return { user, token };
+};
 module.exports = {
   registerUser,
   loginUser,
@@ -97,4 +166,7 @@ module.exports = {
   verifyUserByEmail,
   resendVerificationCodeService,
   generateToken,
+  forgotPassword,
+  resetPassword,
+  socialLogin,
 };

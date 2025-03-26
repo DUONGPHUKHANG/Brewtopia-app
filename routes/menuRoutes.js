@@ -1,34 +1,34 @@
 const express = require("express");
+const router = express.Router();
 const {
-  createMenuItem,
-  getMenuItems,
-  getMenuItem,
-  updateMenuItem,
-  deleteMenuItem,
+  addMenu,
+  getMenu,
+  updateMenu,
+  deleteMenu,
 } = require("../controllers/menuController");
 const { authenticateUser } = require("../middlewares/authMiddleware");
 const { authorizeRoles } = require("../middlewares/roleMiddleware");
 
-const router = express.Router();
+// Thêm món vào menu
+router.post("/:cafeId", addMenu);
 
-// Lấy danh sách món của một quán theo cafeId
-router.get("/:cafeId", getMenuItems);
+// Lấy menu của quán
+router.get("/:cafeId", getMenu);
 
-// Lấy thông tin chi tiết của 1 món theo ID
-router.get("/item/:id", getMenuItem);
-
-// Tạo món mới (chỉ admin)
-router.post("/", authenticateUser, authorizeRoles(["admin"]), createMenuItem);
-
-// Cập nhật món (chỉ admin)
-router.put("/:id", authenticateUser, authorizeRoles(["admin"]), updateMenuItem);
-
-// Xóa món (chỉ admin)
-router.delete(
-  "/:id",
+// Cập nhật món
+router.put(
+  "/item/:itemId",
   authenticateUser,
   authorizeRoles(["admin"]),
-  deleteMenuItem
+  updateMenu
+);
+
+// Xoá món
+router.delete(
+  "/item/:itemId",
+  authenticateUser,
+  authorizeRoles(["admin"]),
+  deleteMenu
 );
 
 module.exports = router;

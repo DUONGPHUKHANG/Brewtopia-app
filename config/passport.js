@@ -1,7 +1,6 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;
-const User = require("../models/User");
 
 passport.use(
   new GoogleStrategy(
@@ -9,16 +8,10 @@ passport.use(
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: "/api/auth/google/callback",
+      profileFields: ["id", "displayName", "emails", "photos"],
     },
-    async (accessToken, refreshToken, profile, done) => {
-      let user = await User.findOne({ email: profile.emails[0].value });
-      if (!user) {
-        user = await User.create({
-          name: profile.displayName,
-          email: profile.emails[0].value,
-        });
-      }
-      done(null, user);
+    (accessToken, refreshToken, profile, done) => {
+      return done(null, profile);
     }
   )
 );
@@ -29,17 +22,18 @@ passport.use(
       clientID: process.env.FACEBOOK_APP_ID,
       clientSecret: process.env.FACEBOOK_APP_SECRET,
       callbackURL: "/api/auth/facebook/callback",
-      profileFields: ["id", "displayName", "emails"],
+      profileFields: ["id", "displayName", "emails", "photos"],
     },
-    async (accessToken, refreshToken, profile, done) => {
-      let user = await User.findOne({ email: profile.emails[0].value });
-      if (!user) {
-        user = await User.create({
-          name: profile.displayName,
-          email: profile.emails[0].value,
-        });
-      }
-      done(null, user);
+    (accessToken, refreshToken, profile, done) => {
+      return done(null, profile);
     }
   )
 );
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((obj, done) => {
+  done(null, obj);
+});

@@ -7,8 +7,9 @@ const EventSchema = new mongoose.Schema(
     description: String,
     date: Date,
     image: String,
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // 🔥 Thêm danh sách followers
   },
   { timestamps: true, versionKey: false }
 );
-
-module.exports = mongoose.model("Event", EventSchema);
+const event = mongoose.model("Event", EventSchema);
+module.exports = event;

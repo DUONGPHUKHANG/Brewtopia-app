@@ -38,6 +38,10 @@ app.use("/api/reviews", require("./routes/reviewRoutes"));
 app.use("/api/comments", require("./routes/commentRoutes"));
 app.use("/api/likes", require("./routes/likeRoutes"));
 app.use("/api/shares", require("./routes/shareRoutes"));
+app.use("/api/events", require("./routes/eventRoutes"));
+app.use("/api/menus", require("./routes/menuRoutes"));
+app.use("/api/businesses", require("./routes/businessRoutes"));
+
 // app.use("/api/chat", require("./routes/chatRoutes"));
 // app.use("/api/aiChat", require("./routes/aiChatRoutes"));
 

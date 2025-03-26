@@ -5,36 +5,43 @@ const createEvent = async (eventData) => {
   return event;
 };
 
-/**
- * Lấy danh sách tất cả sự kiện (sắp xếp theo thời gian tạo giảm dần)
- */
 const getEvents = async () => {
-  const events = await Event.find().sort({ createdAt: -1 });
-  return events;
+  try {
+    const events = await Event.find().sort({ createdAt: -1 });
+    return events;
+  } catch (error) {
+    throw new Error("Không thể lấy danh sách sự kiện");
+  }
 };
 
-/**
- * Lấy thông tin một sự kiện theo ID
- */
 const getEventById = async (id) => {
-  const event = await Event.findById(id);
-  return event;
+  try {
+    const event = await Event.findById(id);
+    if (!event) throw new Error("Sự kiện không tồn tại");
+    return event;
+  } catch (error) {
+    throw new Error("Không thể lấy thông tin sự kiện");
+  }
 };
 
-/**
- * Cập nhật thông tin sự kiện theo ID
- */
 const updateEvent = async (id, eventData) => {
-  const event = await Event.findByIdAndUpdate(id, eventData, { new: true });
-  return event;
+  try {
+    const event = await Event.findByIdAndUpdate(id, eventData, { new: true });
+    if (!event) throw new Error("Sự kiện không tồn tại");
+    return event;
+  } catch (error) {
+    throw new Error("Không thể cập nhật sự kiện");
+  }
 };
 
-/**
- * Xóa sự kiện theo ID
- */
 const deleteEvent = async (id) => {
-  const event = await Event.findByIdAndDelete(id);
-  return event;
+  try {
+    const event = await Event.findByIdAndDelete(id);
+    if (!event) throw new Error("Sự kiện không tồn tại");
+    return { message: "Xóa sự kiện thành công", eventId: id };
+  } catch (error) {
+    throw new Error("Không thể xóa sự kiện");
+  }
 };
 
 module.exports = {
