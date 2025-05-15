@@ -26,7 +26,7 @@ const getUserById = async (req, res) => {
 
 //Controller: Cập nhật thông tin người dùng
 
-const updateUser = async (req, res) => {
+const updateProfileUser = async (req, res) => {
   try {
     const updatedUser = await userService.updateUser(req.params.id, req.body);
     if (!updatedUser)
@@ -53,6 +53,6 @@ const deleteUser = async (req, res) => {
 module.exports = {
   getUsers,
   getUserById,
-  updateUser,
+  updateProfileUser,
   deleteUser,
 };

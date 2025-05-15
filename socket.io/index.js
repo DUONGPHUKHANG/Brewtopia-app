@@ -1,6 +1,7 @@
 const { Server } = require("socket.io");
 const likeHandler = require("./handlers/likeHandler");
 const shareHandler = require("./handlers/shareHandler");
+const chatHandler = require("./handlers/chatHandler");
 
 module.exports = (server) => {
   const io = new Server(server, {
@@ -15,6 +16,7 @@ module.exports = (server) => {
     console.log("🔗 Client connected:", socket.id);
 
     // Truyền `socket` và `io` vào các handler
+    chatHandler(socket, io);
     likeHandler(socket, io);
     shareHandler(socket, io);
 

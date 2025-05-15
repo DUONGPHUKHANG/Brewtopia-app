@@ -2,12 +2,21 @@ const cafeService = require("../services/cafeService");
 
 const createCafe = async (req, res) => {
   try {
-    const cafe = await cafeService.createCafe(req.body);
+    const { body, user } = req;
+
+    const cafe = await cafeService.createCafe({
+      ...body,
+      owner: user.id, // 👈 Chính xác! user.id là ObjectId của người dùng
+    });
+
     res.status(201).json(cafe);
   } catch (error) {
+    console.error(error);
     res.status(400).json({ error: error.message });
   }
 };
+
+//  const business = await businessService.createBusiness(body, user.id, files);
 
 const getCafes = async (req, res) => {
   try {
@@ -30,8 +39,9 @@ const getCafeById = async (req, res) => {
 const updateCafe = async (req, res) => {
   try {
     const cafe = await cafeService.updateCafe(req.params.id, req.body);
-    res.status(200).json({ message: "Đã cập nhật thành công" });
+    res.status(200).json({ message: "Đã cập nhật thành công", cafe });
   } catch (error) {
+    console.log(error);
     res.status(400).json({ error: error.message });
   }
 };

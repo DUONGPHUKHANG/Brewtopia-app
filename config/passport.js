@@ -19,8 +19,25 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
+          // 1. Tìm theo googleId
           let user = await User.findOne({ googleId: profile.id });
 
+          // 2. Nếu chưa có, tìm theo email để “link”
+          if (!user) {
+            const email = profile.emails?.[0]?.value;
+            if (!email) return done(new Error("Google không trả email"), null);
+
+            user = await User.findOne({ email });
+            if (user) {
+              user.googleId = profile.id;
+              user.provider = "google";
+              user.avatar = profile.photos?.[0]?.value || user.avatar;
+              user.isVerified = true;
+              await user.save();
+            }
+          }
+
+          // 3. Nếu chưa có, tạo mới
           if (!user) {
             user = new User({
               googleId: profile.id,
@@ -53,14 +70,27 @@ if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
-          const { id, displayName, emails, photos } = profile;
-          const email = emails && emails.length > 0 ? emails[0].value : null;
-          const avatar = photos && photos.length > 0 ? photos[0].value : null;
+          const email = profile.emails?.[0]?.value;
+          if (!email) {
+            return done(new Error("Facebook không trả về email"), null);
+          }
 
-          if (!email) return done(new Error("Email không hợp lệ"));
+          // 1. Tìm theo facebookId nếu có field này:
+          let user = await User.findOne({ facebookId: profile.id });
 
-          let user = await User.findOne({ email });
+          // 2. Nếu chưa có, tìm theo email để link
+          if (!user) {
+            user = await User.findOne({ email });
+            if (user) {
+              user.facebookId = profile.id;
+              user.provider = "facebook";
+              user.avatar = profile.photos?.[0]?.value || user.avatar;
+              user.isVerified = true;
+              await user.save();
+            }
+          }
 
+          // 3. Nếu vẫn chưa có, tạo mới
           if (!user) {
             user = new User({
               id,

@@ -1,40 +1,24 @@
-const Cafe = require("../models/Cafe");
+const User = require("../models/User");
 const Review = require("../models/Review");
+const Cafe = require("../models/Cafe");
+const cafe = require("../models/Cafe");
 
 // 🏡 Tạo quán cafe mới
 const createCafe = async (cafeData) => {
-  // Kiểm tra thông tin bắt buộc
-  if (!cafeData.name) {
-    throw new Error("Tên quán cafe không được để trống");
-  }
-  if (!cafeData.address) {
-    throw new Error("Địa chỉ quán cafe không được để trống");
-  }
-  if (
-    !cafeData.location ||
-    !cafeData.location.coordinates ||
-    cafeData.location.coordinates.length !== 2
-  ) {
-    throw new Error("Thông tin vị trí quán cafe không hợp lệ");
+  const { owner } = cafeData;
+
+  // Kiểm tra xem user có tồn tại không
+  const user = await User.findById(owner);
+  if (!user) {
+    throw new Error("Người dùng không tồn tại");
   }
 
-  // Validate tọa độ: phải là số và trong phạm vi hợp lệ
-  const [lng, lat] = cafeData.location.coordinates;
-  if (typeof lng !== "number" || typeof lat !== "number") {
-    throw new Error("Tọa độ phải là số");
-  }
-  if (lng < -180 || lng > 180 || lat < -90 || lat > 90) {
-    throw new Error(
-      "Tọa độ không hợp lệ: Kinh độ phải trong [-180, 180] và vĩ độ trong [-90, 90]"
-    );
-  }
+  // Gán status mặc định nếu chưa có
+  cafeData.status = "pending";
 
-  try {
-    const cafe = await Cafe.create(cafeData);
-    return cafe;
-  } catch (err) {
-    throw new Error("Lỗi khi tạo quán cafe: " + err.message);
-  }
+  // Tạo quán cafe mới với toàn bộ dữ liệu
+  const cafe = await Cafe.create(cafeData);
+  return cafe;
 };
 
 // 📜 Lấy danh sách tất cả quán cafe
@@ -63,47 +47,37 @@ const getCafeById = async (id) => {
 
 // ✏️ Cập nhật thông tin quán cafe
 const updateCafe = async (id, cafeData) => {
-  if (!id) throw new Error("ID quán cafe không được để trống");
+  // console.log(cafeData);
 
-  // Nếu có cập nhật location, kiểm tra dữ liệu
-  if (cafeData.location && cafeData.location.coordinates) {
-    if (cafeData.location.coordinates.length !== 2) {
-      throw new Error("Thông tin vị trí không hợp lệ");
-    }
-    const [lng, lat] = cafeData.location.coordinates;
-    if (typeof lng !== "number" || typeof lat !== "number") {
-      throw new Error("Tọa độ phải là số");
-    }
-    if (lng < -180 || lng > 180 || lat < -90 || lat > 90) {
-      throw new Error(
-        "Tọa độ không hợp lệ: Kinh độ phải trong [-180, 180] và vĩ độ trong [-90, 90]"
-      );
-    }
+  if (
+    !cafeData.address ||
+    !cafeData.shopName ||
+    !cafeData.email ||
+    !cafeData.phoneNumber
+  ) {
+    throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc");
   }
 
-  try {
-    const updatedCafe = await Cafe.findByIdAndUpdate(id, cafeData, {
-      new: true,
-      runValidators: true, // Áp dụng validation từ schema
-    });
-    if (!updatedCafe) throw new Error("Không tìm thấy quán cafe với ID: " + id);
-    return updatedCafe;
-  } catch (err) {
-    throw new Error("Lỗi khi cập nhật quán cafe: " + err.message);
+  // Nếu trạng thái hiện tại là pending → cập nhật thành success
+  if (cafeData.status === "pending") {
+    cafeData.status = "success";
   }
+
+  const updatedCafe = await Cafe.findByIdAndUpdate(id, cafeData, {
+    new: true,
+    runValidators: true,
+  });
+
+  return updatedCafe;
 };
 
 // 🗑️ Xóa quán cafe
 const deleteCafe = async (id) => {
   if (!id) throw new Error("ID quán cafe không được để trống");
-  try {
-    const deletedCafe = await Cafe.findByIdAndDelete(id);
-    if (!deletedCafe)
-      throw new Error("Không tìm thấy quán cafe để xóa với ID: " + id);
-    return deletedCafe;
-  } catch (err) {
-    throw new Error("Lỗi khi xóa quán cafe: " + err.message);
-  }
+  const deletedCafe = await Cafe.findByIdAndDelete(id);
+  if (!deletedCafe)
+    throw new Error("Không tìm thấy quán cafe để xóa với ID: " + id);
+  return deletedCafe;
 };
 
 // 🔎 Tìm quán cafe gần vị trí người dùng

@@ -14,6 +14,7 @@ const app = express();
 const server = http.createServer(app);
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
@@ -23,11 +24,9 @@ mongoose
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// Khởi tạo `io` chỉ trong `socket.io/index.js`
 const io = socketHandlers(server);
-app.set("socketio", io); // Lưu `io` vào app để sử dụng sau này
+app.set("socketio", io);
 
-// Inject `io` vào `req` để sử dụng trong controller/service
 app.use((req, res, next) => {
   req.io = io;
   next();
@@ -53,7 +52,8 @@ app.use("/api/likes", require("./routes/likeRoutes"));
 app.use("/api/shares", require("./routes/shareRoutes"));
 app.use("/api/events", require("./routes/eventRoutes"));
 app.use("/api/menus", require("./routes/menuRoutes"));
-app.use("/api/businesses", require("./routes/businessRoutes"));
+// app.use("/api/businesses", require("./routes/businessRoutes"));
+// app.use("/api/profiles", require("./routes/profileRoutes"));
 
 // app.use("/api/chat", require("./routes/chatRoutes"));
 // app.use("/api/aiChat", require("./routes/aiChatRoutes"));
