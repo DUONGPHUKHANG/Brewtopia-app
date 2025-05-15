@@ -6,7 +6,7 @@ const { v4: uuidv4 } = require("uuid");
 const storage = new CloudinaryStorage({
   cloudinary: cloudiNary,
   params: {
-    folder: "business_images",
+    folder: "menu",
     format: async (req, file) => "webp", // Lưu dưới định dạng WEBP
     public_id: (req, file) => uuidv4(), // Tạo tên file duy nhất bằng UUID
   },
