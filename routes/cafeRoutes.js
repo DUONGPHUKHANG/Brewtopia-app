@@ -5,7 +5,7 @@ const {
   getCafeById,
   updateCafe,
   deleteCafe,
-  getCafeMenu,
+  // getCafeMenu,
 } = require("../controllers/cafeController");
 const { authenticateUser } = require("../middlewares/authMiddleware");
 const { authorizeRoles } = require("../middlewares/roleMiddleware");
@@ -15,15 +15,24 @@ const router = express.Router();
 
 router.get("/:id", getCafeById);
 router.get("/", getCafes);
-router.get("/:cafeId/menu", getCafeMenu);
-router.post("/", authenticateUser, authorizeRoles(["admin"]), createCafe);
-router.put(
-  "/:id",
+// router.get("/:cafeId/menu", getCafeMenu);
+router.post(
+  "/",
   authenticateUser,
   authorizeRoles(["admin"]),
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "citizenIdImage", maxCount: 1 },
+  ]),
+  createCafe
+);
+router.put(
+  "/:id",
+  authenticateUser,
+  authorizeRoles(["admin"]),
+  upload.fields([
+    { name: "citizenIdImage", maxCount: 1 },
+    { name: "image", maxCount: 1 }, // ✅ thêm dòng này
   ]),
   updateCafe
 );

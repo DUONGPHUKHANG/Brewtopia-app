@@ -2,6 +2,8 @@ const Cafe = require("../models/Cafe");
 const Menu = require("../models/Menu");
 
 const addMenuItem = async (cafeId, menuData) => {
+  console.log(cafeId, menuData);
+
   if (
     !cafeId ||
     !menuData.name ||

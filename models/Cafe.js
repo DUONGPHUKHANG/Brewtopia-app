@@ -15,19 +15,24 @@ const CafeSchema = new mongoose.Schema(
       default: "pending",
     },
     address: {
-      street: String,
-      ward: String,
-      district: String,
-      city: String,
-      coordinates: { type: [Number], default: [0, 0] },
+      street: { type: String, default: null },
+      ward: { type: String, default: null },
+      district: { type: String, default: null },
+      city: { type: String, default: null },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        default: [0, 0],
+        index: "2dsphere", // Geospatial index for location search
+      },
     },
     email: {
       type: String,
       match: [/.+@.+\..+/, "Please enter a valid email address"],
+      default: null,
     },
-    phoneNumber: { type: String, default: null },
+    phoneNumber: { type: String, default: null }, // Changed to String
     taxInfo: {
-      taxCode: { type: String },
+      taxCode: { type: String, default: null },
       businessType: {
         type: String,
         enum: [
@@ -43,9 +48,10 @@ const CafeSchema = new mongoose.Schema(
     },
     identification: {
       nationality: { type: String, default: null },
-      citizenIdImage: { type: String, default: null }, // URL to image
+      citizenIdImage: { type: String, default: null }, // Not required
     },
-    description: { type: String },
+    description: { type: String, default: null },
+    image: { type: String, default: null },
     openingHours: {
       monday: { type: Object, default: defaultOpeningHour },
       tuesday: { type: Object, default: defaultOpeningHour },
@@ -65,8 +71,5 @@ const CafeSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Tạo index cho trường location để hỗ trợ tìm kiếm không gian (geospatial queries)
-CafeSchema.index({ location: "2dsphere" });
-
-const cafe = mongoose.model("Cafe", CafeSchema);
-module.exports = cafe;
+const Cafe = mongoose.model("Cafe", CafeSchema);
+module.exports = Cafe;

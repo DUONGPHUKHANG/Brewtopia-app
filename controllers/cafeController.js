@@ -2,16 +2,10 @@ const cafeService = require("../services/cafeService");
 
 const createCafe = async (req, res) => {
   try {
-    const { body, user } = req;
-
-    const cafe = await cafeService.createCafe({
-      ...body,
-      owner: user.id, // 👈 Chính xác! user.id là ObjectId của người dùng
-    });
-
-    res.status(201).json(cafe);
+    const data = { ...req.body, owner: req.user.id };
+    const cafe = await cafeService.createCafe(data);
+    res.status(201).json({ message: "Cafe created successfully", cafe });
   } catch (error) {
-    console.error(error);
     res.status(400).json({ error: error.message });
   }
 };
@@ -35,13 +29,28 @@ const getCafeById = async (req, res) => {
     res.status(404).json({ error: error.message });
   }
 };
-
 const updateCafe = async (req, res) => {
   try {
-    const cafe = await cafeService.updateCafe(req.params.id, req.body);
-    res.status(200).json({ message: "Đã cập nhật thành công", cafe });
+    const data = { ...req.body };
+    // Nếu có file citizenIdImage được upload
+    if (req.files && req.files["image"]) {
+      const imageFile = req.files["image"][0];
+      data.image = imageFile.path;
+    }
+    if (req.files && req.files["citizenIdImage"]) {
+      const citizenIdFile = req.files["citizenIdImage"][0];
+      data.identification = {
+        ...data.identification,
+        citizenIdImage: citizenIdFile.path, // Lưu link URL ảnh từ Cloudinary
+      };
+    }
+
+    const cafe = await cafeService.updateCafe(req.params.id, data);
+    if (!cafe) {
+      return res.status(404).json({ error: "Cafe not found" });
+    }
+    res.json({ message: "Cafe updated successfully", cafe });
   } catch (error) {
-    console.log(error);
     res.status(400).json({ error: error.message });
   }
 };
@@ -55,33 +64,33 @@ const deleteCafe = async (req, res) => {
   }
 };
 
-const getCafesNearby = async (req, res) => {
-  try {
-    const { longitude, latitude, maxDistance } = req.query;
-    const cafes = await cafeService.getCafesNearby(
-      longitude,
-      latitude,
-      maxDistance
-    );
-    res.status(200).json(cafes);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
-const getCafeMenu = async (req, res) => {
-  try {
-    const { cafeId } = req.params;
+// const getCafesNearby = async (req, res) => {
+//   try {
+//     const { longitude, latitude, maxDistance } = req.query;
+//     const cafes = await cafeService.getCafesNearby(
+//       longitude,
+//       latitude,
+//       maxDistance
+//     );
+//     res.status(200).json(cafes);
+//   } catch (error) {
+//     res.status(400).json({ message: error.message });
+//   }
+// };
+// const getCafeMenu = async (req, res) => {
+//   try {
+//     const { cafeId } = req.params;
 
-    const menu = await cafeService.getCafeMenu(cafeId);
-    if (!menu) {
-      return res.status(404).json({ message: "Quán cafe không tồn tại" });
-    }
+//     const menu = await cafeService.getCafeMenu(cafeId);
+//     if (!menu) {
+//       return res.status(404).json({ message: "Quán cafe không tồn tại" });
+//     }
 
-    res.status(200).json({ menu });
-  } catch (error) {
-    res.status(500).json({ message: "Lỗi server", error: error.message });
-  }
-};
+//     res.status(200).json({ menu });
+//   } catch (error) {
+//     res.status(500).json({ message: "Lỗi server", error: error.message });
+//   }
+// };
 
 module.exports = {
   createCafe,
@@ -89,6 +98,6 @@ module.exports = {
   getCafeById,
   updateCafe,
   deleteCafe,
-  getCafesNearby,
-  getCafeMenu,
+  // getCafesNearby,
+  // getCafeMenu,
 };

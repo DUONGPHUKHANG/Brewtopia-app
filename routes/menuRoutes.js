@@ -8,9 +8,16 @@ const {
 } = require("../controllers/menuController");
 const { authenticateUser } = require("../middlewares/authMiddleware");
 const { authorizeRoles } = require("../middlewares/roleMiddleware");
+const upload = require("../middlewares/upload");
 
 // Thêm món vào menu
-router.post("/:cafeId", addMenu);
+router.post(
+  "/:cafeId",
+  authenticateUser,
+  authorizeRoles(["admin"]),
+  upload.fields([{ name: "image", maxCount: 1 }]),
+  addMenu
+);
 
 // Lấy menu của quán
 router.get("/:cafeId", getMenu);
