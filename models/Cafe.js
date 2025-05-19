@@ -71,5 +71,5 @@ const CafeSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Cafe = mongoose.model("Cafe", CafeSchema);
+const Cafe = mongoose.model("Cafes", CafeSchema);
 module.exports = Cafe;

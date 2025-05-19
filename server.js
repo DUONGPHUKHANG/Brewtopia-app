@@ -52,7 +52,10 @@ app.use("/api/likes", require("./routes/likeRoutes"));
 app.use("/api/shares", require("./routes/shareRoutes"));
 app.use("/api/events", require("./routes/eventRoutes"));
 app.use("/api/menus", require("./routes/menuRoutes"));
-// app.use("/api/businesses", require("./routes/businessRoutes"));
+app.use("/api/payments", require("./routes/paymentRoutes"));
+app.use("/api/orderMeetingRooms", require("./routes/Orders/MeetingRoomRoutes"));
+app.use("/api/pointPurchases", require("./routes/pointRoutes"));
+// app.use("/api/payments", require("./routes/paymentRoutes"));
 // app.use("/api/profiles", require("./routes/profileRoutes"));
 
 // app.use("/api/chat", require("./routes/chatRoutes"));
