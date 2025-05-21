@@ -1,7 +1,6 @@
 const userService = require("../services/userService");
 
-//Controller: Lấy danh sách người dùng
-
+// Controller: Lấy danh sách người dùng
 const getUsers = async (req, res) => {
   try {
     const users = await userService.getUsers();
@@ -11,8 +10,7 @@ const getUsers = async (req, res) => {
   }
 };
 
-//Controller: Lấy thông tin người dùng theo ID
-
+// Controller: Lấy thông tin người dùng theo ID
 const getUserById = async (req, res) => {
   try {
     const user = await userService.getUserById(req.params.id);
@@ -24,8 +22,19 @@ const getUserById = async (req, res) => {
   }
 };
 
-//Controller: Cập nhật thông tin người dùng
+// Controller: Lấy trạng thái người dùng
+const getUserStatus = async (req, res) => {
+  try {
+    const status = await userService.getUserStatus(req.params.id);
+    if (!status)
+      return res.status(404).json({ message: "Người dùng không tồn tại" });
+    res.status(200).json(status);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server", error: error.message });
+  }
+};
 
+// Controller: Cập nhật thông tin người dùng
 const updateProfileUser = async (req, res) => {
   try {
     const updatedUser = await userService.updateUser(req.params.id, req.body);
@@ -37,8 +46,7 @@ const updateProfileUser = async (req, res) => {
   }
 };
 
-//Controller: Xóa người dùng theo ID
-
+// Controller: Xóa người dùng theo ID
 const deleteUser = async (req, res) => {
   try {
     const deletedUser = await userService.deleteUser(req.params.id);
@@ -53,6 +61,7 @@ const deleteUser = async (req, res) => {
 module.exports = {
   getUsers,
   getUserById,
+  getUserStatus, // Thêm endpoint mới
   updateProfileUser,
   deleteUser,
 };

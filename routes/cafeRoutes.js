@@ -32,7 +32,7 @@ router.put(
   authorizeRoles(["admin"]),
   upload.fields([
     { name: "citizenIdImage", maxCount: 1 },
-    { name: "image", maxCount: 1 }, // ✅ thêm dòng này
+    { name: "image", maxCount: 1 },
   ]),
   updateCafe
 );

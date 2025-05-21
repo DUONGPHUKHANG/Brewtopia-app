@@ -1,8 +1,5 @@
 const eventService = require("../services/eventService");
 
-/**
- * Controller: Tạo sự kiện mới
- */
 const createEvent = async (req, res) => {
   try {
     const event = await eventService.createEvent(req.body);
@@ -14,9 +11,6 @@ const createEvent = async (req, res) => {
   }
 };
 
-/**
- * Controller: Lấy danh sách tất cả sự kiện
- */
 const getEvents = async (req, res) => {
   try {
     const events = await eventService.getEvents();
@@ -28,9 +22,6 @@ const getEvents = async (req, res) => {
   }
 };
 
-/**
- * Controller: Lấy thông tin một sự kiện theo ID
- */
 const getEventById = async (req, res) => {
   try {
     const event = await eventService.getEventById(req.params.id);
@@ -44,9 +35,6 @@ const getEventById = async (req, res) => {
   }
 };
 
-/**
- * Controller: Cập nhật sự kiện theo ID
- */
 const updateEvent = async (req, res) => {
   try {
     const event = await eventService.updateEvent(req.params.id, req.body);
@@ -60,9 +48,6 @@ const updateEvent = async (req, res) => {
   }
 };
 
-/**
- * Controller: Xóa sự kiện theo ID
- */
 const deleteEvent = async (req, res) => {
   try {
     const event = await eventService.deleteEvent(req.params.id);

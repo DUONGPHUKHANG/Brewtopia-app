@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
+const cafeService = require("../services/cafeService");
+const e = require("express");
 
 // Hàm gửi email xác thực
 const sendVerificationEmail = async (user) => {
@@ -23,38 +25,37 @@ const sendVerificationEmail = async (user) => {
 };
 
 const registerUser = async ({ name, email, password, role }) => {
-  // Kiểm tra nếu email đã tồn tại
   const existingUser = await User.findOne({ email });
   if (existingUser) throw new Error("Email đã tồn tại!");
-
-  // Kiểm tra nếu password bị thiếu
   if (!password) throw new Error("Mật khẩu không được để trống!");
-
-  // Mã hóa mật khẩu
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // Tạo user mới với role (nếu không có thì mặc định là "user")
   const user = await User.create({
     name,
     email,
     password: hashedPassword,
     isVerified: false,
-    role: role || "user", // Nếu không truyền role thì mặc định là "user"
+    role: role || "user",
   });
 
-  // Gửi email xác thực
+  if (role === "admin") {
+    const cafeData = {
+      owner: user._id,
+    };
+    await cafeService.createCafe(cafeData);
+  }
   await sendVerificationEmail(user);
   return user;
 };
 
-const loginUser = async ({ email, password }) => {
+const loginUser = async (email, password) => {
   const user = await User.findOne({ email });
-
   if (!user) throw new Error("Tài khoản không tồn tại!");
-  if (!(await bcrypt.compare(password, user.password)))
-    throw new Error("Mật khẩu không chính xác!");
+  const comPass = await bcrypt.compare(password, user.password);
+  if (!comPass) throw new Error("Mật khẩu không chính xác!");
   if (!user.isVerified) throw new Error("Tài khoản chưa xác thực!");
-
+  user.isActive = true;
+  await user.save();
   return user;
 };
 

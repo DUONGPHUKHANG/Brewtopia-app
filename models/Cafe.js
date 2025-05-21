@@ -1,3 +1,4 @@
+// models/Cafe.js
 const mongoose = require("mongoose");
 const defaultOpeningHour = () => ({ open: "08:00", close: "22:00" });
 
@@ -9,11 +10,7 @@ const CafeSchema = new mongoose.Schema(
       required: true,
     },
     shopName: { type: String, default: null },
-    status: {
-      type: String,
-      enum: ["pending", "success"],
-      default: "pending",
-    },
+    status: { type: String, enum: ["pending", "success"], default: "pending" },
     address: {
       street: { type: String, default: null },
       ward: { type: String, default: null },
@@ -22,7 +19,7 @@ const CafeSchema = new mongoose.Schema(
       coordinates: {
         type: [Number], // [longitude, latitude]
         default: [0, 0],
-        index: "2dsphere", // Geospatial index for location search
+        index: "2dsphere",
       },
     },
     email: {
@@ -30,7 +27,7 @@ const CafeSchema = new mongoose.Schema(
       match: [/.+@.+\..+/, "Please enter a valid email address"],
       default: null,
     },
-    phoneNumber: { type: String, default: null }, // Changed to String
+    phoneNumber: { type: String, default: null },
     taxInfo: {
       taxCode: { type: String, default: null },
       businessType: {
@@ -48,7 +45,7 @@ const CafeSchema = new mongoose.Schema(
     },
     identification: {
       nationality: { type: String, default: null },
-      citizenIdImage: { type: String, default: null }, // Not required
+      citizenIdImage: { type: String, default: null },
     },
     description: { type: String, default: null },
     image: { type: String, default: null },

@@ -11,6 +11,15 @@ const getUserById = async (id) => {
   return await User.findById(id).select("-password");
 };
 
+const getUserStatus = async (id) => {
+  const user = await User.findById(id).select("isActive lastActive");
+  if (!user) return null;
+  return {
+    isActive: user.isActive,
+    lastActive: user.lastActive,
+  };
+};
+
 // Lưu ý: Nếu cập nhật password, cần xử lý mã hóa trước khi lưu
 const updateUser = async (id, updateData) => {
   return await User.findByIdAndUpdate(id, updateData, { new: true }).select(
@@ -23,4 +32,10 @@ const deleteUser = async (id) => {
   return await User.findByIdAndDelete(id);
 };
 
-module.exports = { getUsers, getUserById, updateUser, deleteUser };
+module.exports = {
+  getUsers,
+  getUserById,
+  getUserStatus,
+  updateUser,
+  deleteUser,
+};

@@ -14,6 +14,8 @@ const UserSchema = new mongoose.Schema(
       enum: ["local", "google", "facebook"],
       default: "local",
     },
+    isActive: { type: Boolean, default: false },
+    lastActive: { type: Date },
   },
   { timestamps: true, versionKey: false }
 );

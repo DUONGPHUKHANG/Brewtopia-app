@@ -1,13 +1,13 @@
 const authService = require("../services/authService");
 const User = require("../models/User");
 const setCookie = require("../utils/setCookie");
+const Cafe = require("../models/Cafe");
 
 // Đăng ký tài khoản
 const register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body; // Nhận thêm role từ request
+    const { name, email, password, role } = req.body;
 
-    // Kiểm tra xem tất cả trường dữ liệu đã nhập hay chưa
     if (!name || !email || !password) {
       return res.status(400).json({ error: "Vui lòng điền đầy đủ thông tin!" });
     }
@@ -30,13 +30,31 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
-
+    const { email, password } = req.body;
+    const user = await authService.loginUser(email, password);
     if (!user) return res.status(401).json({ message: "User not found" });
 
     const token = authService.generateToken(user);
     setCookie(res, token);
-    res.status(200).json({ status: "success", token, user });
+    // Kiểm tra nếu user là admin
+    if (user.role === "admin") {
+      const cafe = await Cafe.findOne({ owner: user._id });
+      if (cafe && cafe.status === "pending") {
+        return res.status(200).json({
+          status: "success",
+          token,
+          user,
+          message: "Vui lòng cập nhật profile quán cafe của bạn!",
+          cafeId: cafe._id,
+        });
+      }
+    }
+    res.status(200).json({
+      message: "Đăng nhập thành công",
+      status: "success",
+      token,
+      user,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Lỗi server" });

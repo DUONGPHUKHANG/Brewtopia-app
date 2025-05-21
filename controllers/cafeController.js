@@ -4,7 +4,14 @@ const createCafe = async (req, res) => {
   try {
     const data = { ...req.body, owner: req.user.id };
     const cafe = await cafeService.createCafe(data);
-    res.status(201).json({ message: "Cafe created successfully", cafe });
+
+    // Optional: populate menu luôn nếu bạn muốn
+    const populatedCafe = await cafe.populate("menu");
+
+    res.status(201).json({
+      message: "Cafe created successfully with default menu",
+      cafe: populatedCafe,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -32,7 +39,7 @@ const getCafeById = async (req, res) => {
 const updateCafe = async (req, res) => {
   try {
     const data = { ...req.body };
-    // Nếu có file citizenIdImage được upload
+
     if (req.files && req.files["image"]) {
       const imageFile = req.files["image"][0];
       data.image = imageFile.path;
