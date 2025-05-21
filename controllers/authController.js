@@ -48,7 +48,6 @@ const login = async (req, res) => {
       const cafe = await Cafe.findOne({ owner: user._id });
       if (cafe && cafe.status === "pending") {
         return res.status(200).json({
-          status: "success",
           token,
           user,
           message: "Vui lòng cập nhật profile quán cafe của bạn!",

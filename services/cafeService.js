@@ -15,18 +15,13 @@ const createCafe = async (data) => {
 
   return cafe;
 };
-
-// 📜 Lấy danh sách tất cả quán cafe
 const getAllCafes = async () => {
   return await Cafe.find();
 };
-
-// 🔍 Lấy thông tin chi tiết một quán cafe theo ID
 const getCafeById = async (id) => {
   return await Cafe.findById(id);
 };
 
-// ✏️ Cập nhật thông tin quán cafe
 const updateCafe = async (id, data) => {
   data.status = "success";
   return await Cafe.findByIdAndUpdate(id, data, {
