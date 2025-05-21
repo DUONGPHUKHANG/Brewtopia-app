@@ -126,7 +126,7 @@ const forgotPassword = async (email) => {
 };
 
 // ✅ Đặt lại mật khẩu
-const resetPassword = async (token, newPassword) => {
+const resetPwd = async (token, newPassword) => {
   // Hash token từ request để khớp với token đã lưu trong DB
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
@@ -182,6 +182,6 @@ module.exports = {
   resendVerificationCodeService,
   generateToken,
   forgotPassword,
-  resetPassword,
+  resetPwd,
   sendResetPasswordEmail,
 };

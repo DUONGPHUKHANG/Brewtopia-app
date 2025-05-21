@@ -1,4 +1,11 @@
-const authService = require("../services/authService");
+const {
+  registerUser,
+  loginUser,
+  verifyUserByEmail,
+  resendVerificationCodeService,
+  resetPwd,
+  generateToken,
+} = require("../services/authService");
 const User = require("../models/User");
 const setCookie = require("../utils/setCookie");
 const Cafe = require("../models/Cafe");
@@ -13,7 +20,7 @@ const register = async (req, res) => {
     }
 
     // Gọi service để đăng ký user
-    const user = await authService.registerUser({
+    const user = await registerUser({
       name,
       email,
       password,
@@ -31,10 +38,10 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await authService.loginUser(email, password);
+    const user = await loginUser(email, password);
     if (!user) return res.status(401).json({ message: "User not found" });
 
-    const token = authService.generateToken(user);
+    const token = generateToken(user);
     setCookie(res, token);
     // Kiểm tra nếu user là admin
     if (user.role === "admin") {
@@ -64,7 +71,7 @@ const login = async (req, res) => {
 const verifyUser = async (req, res) => {
   try {
     const { email, code } = req.body;
-    const user = await authService.verifyUserByEmail(email, code);
+    const user = await verifyUserByEmail(email, code);
     res.status(200).json({
       message: "Tài khoản đã được xác thực thành công!",
       user: {
@@ -80,7 +87,7 @@ const verifyUser = async (req, res) => {
 const resendVerificationCode = async (req, res) => {
   try {
     const { email } = req.body;
-    await authService.resendVerificationCodeService(email);
+    await resendVerificationCodeService(email);
     res.status(200).json({ message: "Mã xác thực mới đã được gửi" });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -91,7 +98,7 @@ const resendVerificationCode = async (req, res) => {
 const resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
-    const response = await authService.resetPassword(token, newPassword);
+    const response = await resetPwd(token, newPassword);
     res.status(200).json(response);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -102,7 +109,7 @@ const googleLogin = async (req, res) => {
   try {
     const user = req.user;
     // Tạo token
-    const token = authService.generateToken(user);
+    const token = generateToken(user);
     setCookie(res, token);
     res.status(200).json({ status: "success", token, user });
   } catch (error) {
@@ -115,7 +122,7 @@ const facebookLogin = async (req, res) => {
   try {
     const user = req.user;
     // Tạo token
-    const token = authService.generateToken(user);
+    const token = generateToken(user);
     setCookie(res, token); // Đặt cookie
     res.status(200).json({ status: "success", token, user });
   } catch (error) {
@@ -133,7 +140,7 @@ const forgotPassword = async (req, res) => {
     }
 
     // Gọi service để tạo token và gửi email
-    const response = await authService.sendResetPasswordEmail(email);
+    const response = await sendResetPasswordEmail(email);
     res
       .status(200)
       .json({ message: "Email đặt lại mật khẩu đã được gửi!", response });

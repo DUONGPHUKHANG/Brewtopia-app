@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema(
     email: { type: String, unique: true },
     password: String,
     avatar: String,
-    verificationCode: String, // lưu mã xác thực (4 số)
+    verificationCode: String,
     isVerified: { type: Boolean, default: false },
     role: { type: String, enum: ["user", "admin"], default: "user" },
     provider: {
@@ -16,8 +16,14 @@ const UserSchema = new mongoose.Schema(
     },
     isActive: { type: Boolean, default: false },
     lastActive: { type: Date },
+    points: {
+      type: Number,
+      default: 0,
+      min: [0, "Points must be non-negative"],
+    },
   },
   { timestamps: true, versionKey: false }
 );
-const user = mongoose.model("User", UserSchema);
-module.exports = user;
+
+const User = mongoose.model("User", UserSchema);
+module.exports = User;

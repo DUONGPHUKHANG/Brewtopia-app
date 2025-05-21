@@ -1,6 +1,7 @@
+// PointPurchase.js
 const mongoose = require("mongoose");
 
-const PointBonusSchema = new mongoose.Schema(
+const PointPurchaseSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -10,12 +11,13 @@ const PointBonusSchema = new mongoose.Schema(
     points: {
       type: Number,
       required: true,
+      min: [0, "Points must be non-negative"],
     },
     type: {
       type: String,
-      enum: ["daily", "event", "referral", "manual", "task"],
+      enum: ["package", "promotion", "manual"],
       required: true,
-      default: "manual", //mặc định là thủ công
+      default: "package",
     },
     note: {
       type: String,
@@ -29,5 +31,7 @@ const PointBonusSchema = new mongoose.Schema(
   },
   { timestamps: true, versionKey: false }
 );
-const PointBonus = mongoose.model("PointBonus", PointBonusSchema);
-module.exports = PointBonus;
+
+PointPurchaseSchema.index({ user: 1, status: 1 });
+const PointPurchase = mongoose.model("PointPurchase", PointPurchaseSchema);
+module.exports = PointPurchase;

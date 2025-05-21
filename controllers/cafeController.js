@@ -7,6 +7,7 @@ const createCafe = async (req, res) => {
 
     // Optional: populate menu luôn nếu bạn muốn
     const populatedCafe = await cafe.populate("menu");
+    console.log("đã tạo quán cafe");
 
     res.status(201).json({
       message: "Cafe created successfully with default menu",
