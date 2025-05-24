@@ -8,5 +8,9 @@ const PostSchema = new mongoose.Schema(
   },
   { timestamps: true, versionKey: false }
 );
-const post = mongoose.model("Post", PostSchema);
-module.exports = post;
+
+PostSchema.index({ user: 1 });
+PostSchema.index({ createdAt: -1 });
+
+const Post = mongoose.model("Post", PostSchema);
+module.exports = Post;

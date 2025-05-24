@@ -8,9 +8,13 @@ const LikeSchema = new mongoose.Schema(
       required: true,
       refPath: "targetModel",
     },
-    targetModel: { type: String, enum: ["Post", "Review"], required: true }, // Xác định loại đối tượng được like
+    targetModel: { type: String, enum: ["Post", "Review"], required: true },
   },
   { timestamps: true, versionKey: false }
 );
-const like = mongoose.model("Like", LikeSchema);
-module.exports = like;
+
+LikeSchema.index({ user: 1 });
+LikeSchema.index({ target: 1, targetModel: 1 });
+
+const Like = mongoose.model("Like", LikeSchema);
+module.exports = Like;

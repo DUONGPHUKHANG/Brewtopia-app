@@ -5,6 +5,7 @@ const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const cafeService = require("../services/cafeService");
 const e = require("express");
+const { log } = require("console");
 
 // Hàm gửi email xác thực
 const sendVerificationEmail = async (user) => {
@@ -78,7 +79,7 @@ const verifyUserByEmail = async (email, code) => {
   return user;
 };
 
-const generateToken = (user) => {
+const generateToken = async (user) => {
   return jwt.sign(
     { email: user.email, id: user.id, role: user.role || "user" },
     process.env.JWT_SECRET_KEY,
@@ -127,22 +128,15 @@ const forgotPassword = async (email) => {
 
 // ✅ Đặt lại mật khẩu
 const resetPwd = async (token, newPassword) => {
-  // Hash token từ request để khớp với token đã lưu trong DB
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-
   const user = await User.findOne({
     resetPasswordToken: hashedToken,
-    resetPasswordExpires: { $gt: Date.now() }, // Kiểm tra token còn hạn không
+    resetPasswordExpires: { $gt: Date.now() },
   });
-
-  console.log("User tìm thấy:", user);
-
   if (!user) throw new Error("Token không hợp lệ hoặc đã hết hạn!");
-
   // ✅ Mã hóa mật khẩu mới
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(newPassword, salt);
-
   // ✅ Xóa token sau khi đặt lại mật khẩu
   user.resetPasswordToken = undefined;
   user.resetPasswordExpires = undefined;

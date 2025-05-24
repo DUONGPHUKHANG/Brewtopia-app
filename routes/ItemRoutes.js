@@ -8,16 +8,14 @@ const {
 } = require("../controllers/itemController");
 const { authenticateUser } = require("../middlewares/authMiddleware");
 const { authorizeRoles } = require("../middlewares/roleMiddleware");
-const upload = require("../middlewares/upload"); // middleware upload
+const { uploadFields } = require("../middlewares/upload"); // Import uploadFields
 
-// Lấy Item từ menu
-// router.get("/:cafeId", getMenu);
 // Thêm món Item
 router.post(
   "/:id",
   authenticateUser,
   authorizeRoles(["admin"]),
-  upload.fields([{ name: "image", maxCount: 1 }]),
+  uploadFields("itemMenu-images", [{ name: "image", maxCount: 1 }]),
   addItem
 );
 

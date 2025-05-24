@@ -31,6 +31,7 @@ app.use((req, res, next) => {
   req.io = io;
   next();
 });
+
 // Cấu hình session
 app.use(
   session({
@@ -39,10 +40,10 @@ app.use(
     saveUninitialized: true,
   })
 );
-app.use(passport.initialize()); // Phải có dòng này
+app.use(passport.initialize());
 app.use(passport.session());
 
-// Import Routes
+// // Import Routes
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/cafes", require("./routes/cafeRoutes"));
@@ -56,8 +57,7 @@ app.use("/api/menu-items", require("./routes/itemRoutes"));
 app.use("/api/payments", require("./routes/paymentRoutes"));
 app.use("/api/orderMeetingRooms", require("./routes/Orders/MeetingRoomRoutes"));
 app.use("/api/point-Bonus", require("./routes/pointBonusRoutes"));
-// app.use("/api/payments", require("./routes/paymentRoutes"));
-// app.use("/api/profiles", require("./routes/profileRoutes"));
+app.use("/api/posts", require("./routes/postRoutes"));
 
 // app.use("/api/chat", require("./routes/chatRoutes"));
 // app.use("/api/aiChat", require("./routes/aiChatRoutes"));

@@ -7,7 +7,6 @@ const Event = require("../models/Event");
 // 🏡 Tạo quán cafe mới
 const createCafe = async (data) => {
   const cafe = await Cafe.create(data);
-  console.log(cafe);
   // const user = await User.findById(data.user);
   const menu = await Menu.create({ cafe: cafe._id });
   cafe.menu.push(menu._id);

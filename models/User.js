@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 const UserSchema = new mongoose.Schema(
   {
     name: String,
-    email: { type: String, unique: true },
-    password: String,
+    email: { type: String, unique: true, index: true },
+    password: { type: String },
     avatar: String,
     verificationCode: String,
     isVerified: { type: Boolean, default: false },
@@ -24,6 +24,9 @@ const UserSchema = new mongoose.Schema(
   },
   { timestamps: true, versionKey: false }
 );
+
+// Đảm bảo index cho email
+UserSchema.index({ email: 1 });
 
 const User = mongoose.model("User", UserSchema);
 module.exports = User;

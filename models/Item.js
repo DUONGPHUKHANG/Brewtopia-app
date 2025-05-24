@@ -17,5 +17,8 @@ const MenuItemSchema = new mongoose.Schema(
   { timestamps: true, versionKey: false }
 );
 
+// Đảm bảo chỉ định index cần thiết
+MenuItemSchema.index({ menuId: 1 }); // Index cho menuId để tăng tốc findByIdAndUpdate
+
 const Item = mongoose.model("MenuItem", MenuItemSchema);
 module.exports = Item;

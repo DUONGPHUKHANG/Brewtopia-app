@@ -17,5 +17,7 @@ const ShareSchema = new mongoose.Schema(
   },
   { timestamps: true, versionKey: false }
 );
-const share = mongoose.model("Share", ShareSchema);
-module.exports = share;
+ShareSchema.index({ user: 1 });
+ShareSchema.index({ target: 1, targetModel: 1 });
+const Share = mongoose.model("Share", ShareSchema);
+module.exports = Share;

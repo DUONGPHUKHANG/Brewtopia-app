@@ -9,7 +9,7 @@ const {
 const User = require("../models/User");
 const setCookie = require("../utils/setCookie");
 const Cafe = require("../models/Cafe");
-
+const { token } = require("morgan");
 // Đăng ký tài khoản
 const register = async (req, res) => {
   try {
@@ -40,8 +40,7 @@ const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await loginUser(email, password);
     if (!user) return res.status(401).json({ message: "User not found" });
-
-    const token = generateToken(user);
+    const token = await generateToken(user);
     setCookie(res, token);
     // Kiểm tra nếu user là admin
     if (user.role === "admin") {
@@ -107,10 +106,12 @@ const resetPassword = async (req, res) => {
 const googleLogin = async (req, res) => {
   try {
     const user = req.user;
-    // Tạo token
-    const token = generateToken(user);
+    user.isActive = true;
+    const token = await generateToken(user);
+    console.log(token);
+    await user.save();
     setCookie(res, token);
-    res.status(200).json({ status: "success", token, user });
+    res.status(200).json({ status: "success", token: token, user });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Lỗi server" });
@@ -120,8 +121,12 @@ const googleLogin = async (req, res) => {
 const facebookLogin = async (req, res) => {
   try {
     const user = req.user;
+    user.isActive = true;
     // Tạo token
     const token = generateToken(user);
+    console.log(token);
+
+    await user.save();
     setCookie(res, token); // Đặt cookie
     res.status(200).json({ status: "success", token, user });
   } catch (error) {

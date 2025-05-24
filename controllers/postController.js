@@ -1,0 +1,49 @@
+const {
+  createPost,
+  getBonusPoint,
+  getAllPosts,
+} = require("../services/postService");
+
+const createPostSocial = async (req, res) => {
+  try {
+    const { content } = req.body;
+    if (!content) {
+      return res.status(400).json({ message: "Content is required" });
+    }
+    const post = await createPost(req.user.id, content, req.files);
+    console.log("đăng bài thành công");
+    return res.status(201).json({ message: "Post created successfully", post });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const getPointBonus = async (req, res) => {
+  try {
+    const pointData = await getBonusPoint(req.user.id);
+    return res
+      .status(200)
+      .json({ message: "Point bonus retrieved", data: pointData });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const getPosts = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const postsData = await getAllPosts(parseInt(page), parseInt(limit));
+    return res
+      .status(200)
+      .json({ message: "Posts retrieved successfully", ...postsData });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = {
+  createPostSocial,
+  getPointBonus,
+  getPosts,
+};

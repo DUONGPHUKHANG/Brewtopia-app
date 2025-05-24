@@ -9,7 +9,9 @@ const addItem = async (req, res) => {
       const imageFile = req.files["image"][0];
       data.image = imageFile.path;
     }
-    const newItemItem = await additem(MenuId, req.body);
+    console.log("đã thêm 1 món thành công");
+    const newItemItem = await additem(MenuId, data);
+
     res.status(201).json(newItemItem);
   } catch (error) {
     res.status(400).json({ message: error.message });
