@@ -5,11 +5,13 @@ const {
   addItem,
   updateItem,
   deleteItem,
+  getItems,
 } = require("../controllers/itemController");
 const { authenticateUser } = require("../middlewares/authMiddleware");
 const { authorizeRoles } = require("../middlewares/roleMiddleware");
 const { uploadFields } = require("../middlewares/upload"); // Import uploadFields
 
+router.get("/:menuId", getItems);
 // Thêm món Item
 router.post(
   "/:id",

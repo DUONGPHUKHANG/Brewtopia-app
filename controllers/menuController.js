@@ -12,8 +12,8 @@ const getMenu = async (req, res) => {
 
 const deleteMenu = async (req, res) => {
   try {
-    const { Menuid } = req.params;
-    const deletedItem = await deleteMenuItem(Menuid);
+    const { itemId } = req.params; // Đổi từ Menuid thành itemId
+    const deletedItem = await deleteMenuItem(itemId);
     res.status(200).json(deletedItem);
   } catch (error) {
     res.status(400).json({ message: error.message });

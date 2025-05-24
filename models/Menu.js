@@ -1,3 +1,4 @@
+// models/Menu.js
 const mongoose = require("mongoose");
 
 const MenuSchema = new mongoose.Schema(
@@ -14,16 +15,32 @@ const MenuSchema = new mongoose.Schema(
   { timestamps: true, versionKey: false }
 );
 
-// Middleware để tự động cập nhật itemCount
+// Middleware để cập nhật itemCount
 MenuSchema.pre("findOneAndUpdate", async function (next) {
-  const update = this.getUpdate();
-  if (update.$push && update.$push.items) {
-    this.update({}, { $inc: { itemCount: 1 } });
+  try {
+    const update = this.getUpdate();
+    if (update.$push && update.$push.items) {
+      this.set({ $inc: { itemCount: 1 } });
+    } else if (update.$pull && update.$pull.items) {
+      this.set({ $inc: { itemCount: -1 } });
+    } else if (update.$set && update.$set.items) {
+      this.set({ itemCount: update.$set.items.length });
+    }
+    next();
+  } catch (error) {
+    next(error);
   }
-  if (update.$pull && update.$pull.items) {
-    this.update({}, { $inc: { itemCount: -1 } });
+});
+
+// Middleware để kiểm tra và sửa itemCount sau khi cập nhật
+MenuSchema.post("findOneAndUpdate", async function (doc) {
+  if (doc) {
+    const updatedMenu = await this.model.findById(doc._id);
+    if (updatedMenu.items.length !== updatedMenu.itemCount) {
+      updatedMenu.itemCount = updatedMenu.items.length;
+      await updatedMenu.save();
+    }
   }
-  next();
 });
 
 const Menu = mongoose.model("Menu", MenuSchema);

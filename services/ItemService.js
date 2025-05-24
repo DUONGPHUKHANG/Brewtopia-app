@@ -1,6 +1,11 @@
 const Item = require("../models/Item");
 const Menu = require("../models/Menu");
 
+const getItem = async (menuId) => {
+  if (!menuId) throw new Error("ID menu không được để trống");
+  const item = await Item.find({ menuId: menuId });
+  return item;
+};
 const additem = async (menuId, itemData) => {
   if (
     !menuId ||
@@ -20,15 +25,19 @@ const additem = async (menuId, itemData) => {
     price: Number(itemData.price),
     category: itemData.category,
     image: itemData.image,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    bestSeller: itemData.bestSeller || false,
   };
-  const result = await Item.collection.insertOne(newItemData);
-  const newItem = { ...newItemData, _id: result.insertedId };
-  await Menu.collection.updateOne(
-    { _id: menuId },
-    { $push: { items: newItem._id } }
+
+  const newItem = await Item.create(newItemData);
+  await Menu.findByIdAndUpdate(
+    menuId,
+    {
+      $push: { items: newItem._id },
+      $inc: { itemCount: 1 },
+    },
+    { new: true }
   );
+
   return newItem;
 };
 
@@ -53,4 +62,5 @@ module.exports = {
   additem,
   updateitem,
   deleteitem,
+  getItem,
 };
