@@ -52,6 +52,8 @@ const updateitem = async (itemId, updateData) => {
 };
 
 const deleteitem = async (itemId) => {
+  console.log(itemId);
+
   if (!itemId) throw new Error("ID món không được để trống");
   const deletedItem = await Item.findByIdAndDelete(itemId);
   if (!deletedItem) throw new Error("Không tìm thấy món ăn để xóa");

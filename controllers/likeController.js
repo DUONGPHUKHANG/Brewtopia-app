@@ -1,6 +1,6 @@
-const likeService = require("../services/likeService");
+const { likeOrUnlike, getLikesCount } = require("../services/likeService");
 
-const likeOrUnlike = async (req, res) => {
+const likeOrUnlikes = async (req, res) => {
   try {
     const { targetId, targetModel } = req.body;
     const userId = req.user.id;
@@ -11,12 +11,7 @@ const likeOrUnlike = async (req, res) => {
         .json({ message: "Thiếu targetId hoặc targetModel" });
     }
 
-    const result = await likeService.likeOrUnlike(
-      userId,
-      targetId,
-      targetModel,
-      req.io
-    );
+    const result = await likeOrUnlike(userId, targetId, targetModel, req.io);
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({
@@ -36,7 +31,7 @@ const getLikes = async (req, res) => {
       return res.status(400).json({ message: "Thiếu targetModel" });
     }
 
-    const count = await likeService.getLikesCount(targetId, targetModel);
+    const count = await getLikesCount(targetId, targetModel);
     res.status(200).json({ likeCount: count });
   } catch (error) {
     res.status(500).json({
@@ -47,4 +42,4 @@ const getLikes = async (req, res) => {
   }
 };
 
-module.exports = { getLikes, likeOrUnlike };
+module.exports = { getLikes, likeOrUnlikes };

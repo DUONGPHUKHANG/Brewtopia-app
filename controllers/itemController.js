@@ -43,7 +43,7 @@ const updateItem = async (req, res) => {
 
 const deleteItem = async (req, res) => {
   try {
-    const { itemId } = req.params;
+    const itemId = req.params.id;
     const deletedItemItem = await deleteitem(itemId);
     res.status(200).json(deletedItemItem);
   } catch (error) {
