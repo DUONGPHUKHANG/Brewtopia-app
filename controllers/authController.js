@@ -108,7 +108,6 @@ const googleLogin = async (req, res) => {
     const user = req.user;
     user.isActive = true;
     const token = await generateToken(user);
-    console.log(token);
     await user.save();
     setCookie(res, token);
     res.status(200).json({ status: "success", token: token, user });
@@ -123,12 +122,11 @@ const facebookLogin = async (req, res) => {
     const user = req.user;
     user.isActive = true;
     // Tạo token
-    const token = generateToken(user);
+    const token = await generateToken(user);
     console.log(token);
-
     await user.save();
     setCookie(res, token); // Đặt cookie
-    res.status(200).json({ status: "success", token, user });
+    res.status(200).json({ status: "success", token: token, user });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Lỗi server" });

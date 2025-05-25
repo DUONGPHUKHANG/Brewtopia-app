@@ -93,10 +93,10 @@ if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
           // 3. Nếu vẫn chưa có, tạo mới
           if (!user) {
             user = new User({
-              id,
-              name: displayName,
-              email,
-              avatar,
+              id: profile.id,
+              name: profile.displayName,
+              email: profile.emails[0].value,
+              avatar: profile.avatar,
               provider: "facebook",
               isVerified: true,
             });

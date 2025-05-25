@@ -58,12 +58,7 @@ const getReviewById = async (id) => {
 
 // Lấy danh sách tất cả review
 const getAllReviews = async () => {
-  try {
-    const reviews = await Review.find().populate("user cafe");
-    return reviews;
-  } catch (err) {
-    throw new Error("Lỗi khi lấy danh sách review: " + err.message);
-  }
+  return await Review.find();
 };
 
 // Cập nhật review

@@ -1,20 +1,70 @@
 const Event = require("../models/Event");
 
-const createEvent = async (eventData) => {
-  const event = await Event.create(eventData);
+const creEvent = async (eventData) => {
+  // Kiểm tra dữ liệu đầu vào
+  if (!eventData.title || !eventData.description || !eventData.image) {
+    throw new Error("Thiếu các trường bắt buộc: title, description and image");
+  }
+
+  // Tạo object sự kiện mới
+  const newEvent = {
+    ...eventData,
+    followers: [],
+  };
+
+  // Tạo sự kiện trong database
+  const event = await Event.create(newEvent);
   return event;
 };
 
-const getEvents = async () => {
+const getEventAll = async () => {
   try {
-    const events = await Event.find().sort({ createdAt: -1 });
+    const events = await Event.find();
     return events;
   } catch (error) {
     throw new Error("Không thể lấy danh sách sự kiện");
   }
 };
+const followEvent = async (eventId, userId) => {
+  try {
+    const event = await Event.findById(eventId);
+    if (!event) throw new Error("Sự kiện không tồn tại");
 
-const getEventById = async (id) => {
+    // Kiểm tra xem người dùng đã quan tâm chưa
+    if (event.followers.includes(userId)) {
+      throw new Error("Người dùng đã quan tâm sự kiện này");
+    }
+
+    // Thêm userId vào mảng followers
+    event.followers.push(userId);
+    await event.save();
+    return event;
+  } catch (error) {
+    throw new Error(error.message || "Không thể quan tâm sự kiện");
+  }
+};
+
+const unfollowEvent = async (eventId, userId) => {
+  try {
+    const event = await Event.findById(eventId);
+    if (!event) throw new Error("Sự kiện không tồn tại");
+
+    // Kiểm tra xem người dùng có trong danh sách followers không
+    if (!event.followers.includes(userId)) {
+      throw new Error("Người dùng chưa quan tâm sự kiện này");
+    }
+
+    // Xóa userId khỏi mảng followers
+    event.followers = event.followers.filter(
+      (id) => id.toString() !== userId.toString()
+    );
+    await event.save();
+    return event;
+  } catch (error) {
+    throw new Error(error.message || "Không thể bỏ quan tâm sự kiện");
+  }
+};
+const getEvent = async (id) => {
   try {
     const event = await Event.findById(id);
     if (!event) throw new Error("Sự kiện không tồn tại");
@@ -24,7 +74,7 @@ const getEventById = async (id) => {
   }
 };
 
-const updateEvent = async (id, eventData) => {
+const upEvent = async (id, eventData) => {
   try {
     const event = await Event.findByIdAndUpdate(id, eventData, { new: true });
     if (!event) throw new Error("Sự kiện không tồn tại");
@@ -34,7 +84,7 @@ const updateEvent = async (id, eventData) => {
   }
 };
 
-const deleteEvent = async (id) => {
+const delEvent = async (id) => {
   try {
     const event = await Event.findByIdAndDelete(id);
     if (!event) throw new Error("Sự kiện không tồn tại");
@@ -45,9 +95,11 @@ const deleteEvent = async (id) => {
 };
 
 module.exports = {
-  createEvent,
-  getEvents,
-  getEventById,
-  updateEvent,
-  deleteEvent,
+  creEvent,
+  getEventAll,
+  getEvent,
+  upEvent,
+  delEvent,
+  followEvent,
+  unfollowEvent,
 };
