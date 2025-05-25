@@ -61,7 +61,6 @@ const CafeSchema = new mongoose.Schema(
     services: [{ type: String }],
     menu: [{ type: mongoose.Schema.Types.ObjectId, ref: "Menu" }],
     event: [{ type: mongoose.Schema.Types.ObjectId, ref: "Event" }],
-    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
     rating: { type: Number, default: 0 },
     reviewCount: { type: Number, default: 0 },
   },

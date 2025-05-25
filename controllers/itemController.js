@@ -45,7 +45,9 @@ const deleteItem = async (req, res) => {
   try {
     const itemId = req.params.id;
     const deletedItemItem = await deleteitem(itemId);
-    res.status(200).json(deletedItemItem);
+    res
+      .status(200)
+      .json({ message: "đã xóa 1 món thành công" }, deletedItemItem);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

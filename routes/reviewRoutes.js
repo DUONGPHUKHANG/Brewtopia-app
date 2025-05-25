@@ -8,20 +8,20 @@ const {
   getReviewsByCafe,
 } = require("../controllers/reviewController");
 const { authenticateUser } = require("../middlewares/authMiddleware");
-const { authorizeRoles } = require("../middlewares/roleMiddleware");
+const { uploadFields } = require("../middlewares/upload");
 
 const router = express.Router();
 
 router.get("/", getAllReviews);
 router.get("/:id", getReviewById);
-router.post("/", authenticateUser, createReview);
-router.put("/:id", authenticateUser, updateReview);
-router.delete(
-  "/:id",
+router.post(
+  "/",
   authenticateUser,
-  authorizeRoles(["admin"]),
-  deleteReview
+  uploadFields("reviews-images", [{ name: "images", maxCount: 2 }]),
+  createReview
 );
+router.put("/:id", authenticateUser, updateReview);
+router.delete("/:id", authenticateUser, deleteReview);
 router.post("/cafe/:cafeId", getReviewsByCafe);
 
 module.exports = router;

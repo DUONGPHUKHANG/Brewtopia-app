@@ -63,30 +63,37 @@ const deleteCafe = async (id) => {
 //     throw new Error("Lỗi khi tìm quán cafe gần vị trí của bạn: " + err.message);
 //   }
 // };
-// const updateCafeRating = async (cafeId) => {
-//   try {
-//     // Lấy tất cả review hợp lệ (chỉ đếm review của user, không đếm admin)
-//     const reviews = await Review.find({ cafe: cafeId }).populate("user");
-//     const validReviews = reviews.filter(
-//       (review) => review.user.role === "user"
-//     );
+const updateCafeRating = async (cafeId) => {
+  try {
+    // Lấy tất cả review của quán
+    const reviews = await Review.find({ cafe: cafeId }).populate("user");
 
-//     const reviewCount = validReviews.length;
-//     const averageRating = reviewCount
-//       ? validReviews.reduce((sum, review) => sum + review.rating, 0) /
-//         reviewCount
-//       : 0;
+    // Lọc chỉ những review từ user thường
+    const validReviews = reviews.filter(
+      (review) => review.user && review.user.role === "user"
+    );
 
-//     // Cập nhật rating và số lượng review
-//     await Cafe.findByIdAndUpdate(cafeId, {
-//       rating: Number(averageRating.toFixed(1)), // Chuyển về số
-//       reviewCount: reviewCount,
-//       reviews: validReviews.map((r) => r._id), // Đảm bảo danh sách review luôn đúng
-//     });
-//   } catch (err) {
-//     throw new Error("Lỗi khi cập nhật rating: " + err.message);
-//   }
-// };
+    const reviewCount = validReviews.length;
+    const totalRating = validReviews.reduce(
+      (sum, review) => sum + review.rating,
+      0
+    );
+    const averageRating = reviewCount ? totalRating / reviewCount : 0;
+    console.log(averageRating);
+
+    // Cập nhật vào Cafe
+    await Cafe.findByIdAndUpdate(cafeId, {
+      rating: Number(averageRating.toFixed(1)),
+      reviewCount,
+      reviews: validReviews.map((r) => r._id),
+    });
+    console.log("Valid Reviews:", validReviews);
+    console.log("Avg Rating:", averageRating);
+  } catch (err) {
+    console.error("Lỗi khi cập nhật rating:", err);
+    throw new Error("Lỗi khi cập nhật rating: " + err.message);
+  }
+};
 // const getCafeMenu = async (cafeId) => {
 //   try {
 //     const cafe = await Cafe.findById(cafeId).populate("menu");
@@ -104,6 +111,6 @@ module.exports = {
   updateCafe,
   deleteCafe,
   // getCafesNearby,
-  // updateCafeRating,
+  updateCafeRating,
   // getCafeMenu,
 };

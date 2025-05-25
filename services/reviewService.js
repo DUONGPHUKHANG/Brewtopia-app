@@ -3,44 +3,40 @@ const Review = require("../models/Review");
 const User = require("../models/User");
 const { updateCafeRating } = require("./cafeService");
 
-// Tạo một review mới
-const createReview = async (reviewData) => {
+const createReview = async (reviewData, userId) => {
+  const user = userId;
+  const { cafe, content, rating, image } = reviewData;
+
   // Kiểm tra thông tin bắt buộc
-  if (
-    !reviewData.user ||
-    !reviewData.cafe ||
-    !reviewData.content ||
-    reviewData.rating == null
-  ) {
+  if (!cafe || !content || rating == null) {
     throw new Error(
-      "Thiếu thông tin: user, cafe, nội dung review và rating không được để trống"
+      "Thiếu thông tin: cafe, nội dung review và rating không được để trống"
     );
   }
 
   // Kiểm tra quán cafe có tồn tại không
-  const cafeExists = await Cafe.findById(reviewData.cafe);
+  const cafeExists = await Cafe.findById(cafe);
   if (!cafeExists) {
     throw new Error("Quán cafe không tồn tại");
   }
 
   try {
     // Tạo review mới
-    const newReview = await Review.create(reviewData);
+    const newReview = await Review.create({
+      cafe,
+      content,
+      rating,
+      images: image,
+      user, // ID của người dùng đã có từ JWT
+    });
 
-    // Lấy user từ database để kiểm tra vai trò
-    const user = await User.findById(reviewData.user);
+    // Cập nhật quán cafe: thêm review và cập nhật điểm rating
+    await Cafe.findByIdAndUpdate(cafe, {
+      $push: { reviews: newReview._id },
+    });
 
-    if (!user) throw new Error("Người dùng không tồn tại");
-
-    if (user.role === "user") {
-      // Thêm review vào danh sách của quán cafe và tăng số lượng review
-      await Cafe.findByIdAndUpdate(reviewData.cafe, {
-        $push: { reviews: newReview._id },
-      });
-
-      // Cập nhật lại số lượng review và rating
-      await updateCafeRating(reviewData.cafe);
-    }
+    // Cập nhật lại điểm đánh giá trung bình
+    await updateCafeRating(cafe);
 
     return newReview;
   } catch (err) {

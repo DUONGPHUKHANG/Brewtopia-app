@@ -1,13 +1,14 @@
 const reviewService = require("../services/reviewService");
-const Review = require("../models/Review");
 // Tạo review mới
 const createReview = async (req, res) => {
   try {
-    const { cafe, content, rating } = req.body;
-    const userId = req.user.id;
-
-    const reviewData = { user: userId, cafe, content, rating };
-    const review = await reviewService.createReview(reviewData);
+    const user = req.user.id;
+    const data = req.body;
+    if (req.files && req.files["images"]) {
+      const imageFile = req.files["images"][0];
+      data.image = imageFile.path;
+    }
+    const review = await reviewService.createReview(data, user);
 
     res.status(201).json({ message: "Đánh giá thành công", review });
   } catch (error) {
