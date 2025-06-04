@@ -3,6 +3,7 @@ const {
   createPostSocial,
   getPointBonus,
   getPosts,
+  getPostsByIds,
 } = require("../controllers/postController");
 const { authenticateUser } = require("../middlewares/authMiddleware");
 const { uploadArray, handleMulterError } = require("../middlewares/upload");
@@ -16,7 +17,9 @@ router.post(
   handleMulterError,
   createPostSocial
 );
-router.get("/", authenticateUser, getPosts);
+// router.get("/", authenticateUser, getPosts);
+router.get("/", authenticateUser, getPostsByIds);
+
 router.get("/points", authenticateUser, getPointBonus);
 
 module.exports = router;

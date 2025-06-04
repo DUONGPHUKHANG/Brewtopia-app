@@ -2,6 +2,7 @@ const {
   createPost,
   getBonusPoint,
   getAllPosts,
+  getPostsById,
 } = require("../services/postService");
 
 const createPostSocial = async (req, res) => {
@@ -42,8 +43,22 @@ const getPosts = async (req, res) => {
   }
 };
 
+const getPostsByIds = async (req, res) => {
+  try {
+    const user = req.user.id;
+    const { page = 1, limit = 10 } = req.query;
+    const postsData = await getPostsById(user, parseInt(page), parseInt(limit));
+    return res
+      .status(200)
+      .json({ message: "Posts retrieved successfully", ...postsData });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createPostSocial,
   getPointBonus,
   getPosts,
+  getPostsByIds,
 };

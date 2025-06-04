@@ -56,7 +56,43 @@ const getAllPosts = async (page = 1, limit = 10) => {
     throw new Error(`Failed to fetch posts: ${error.message}`);
   }
 };
+const getPostsById = async (id, page = 1, limit = 10) => {
+  try {
+    const skip = (page - 1) * limit;
+    const posts = await Post.find({ user: id })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .lean();
 
+    const postsWithCounts = await Promise.all(
+      posts.map(async (post) => {
+        const [likeCount, shareCount, commentCount] = await Promise.all([
+          Like.countDocuments({ target: post._id, targetModel: "Post" }),
+          Share.countDocuments({ target: post._id, targetModel: "Post" }),
+          Comment.countDocuments({ targetId: post._id, targetType: "Post" }),
+        ]);
+        return {
+          ...post,
+          likeCount,
+          shareCount,
+          commentCount,
+        };
+      })
+    );
+    console.log(postsWithCounts);
+
+    const total = await Post.countDocuments();
+    return {
+      posts: postsWithCounts,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
+  } catch (error) {
+    throw new Error(`Failed to fetch posts: ${error.message}`);
+  }
+};
 const getBonusPoint = async (userId) => {
   const posts = await Post.countDocuments({ user: userId });
   const likes = await Like.countDocuments({
@@ -76,4 +112,4 @@ const getBonusPoint = async (userId) => {
   return { userId, points, posts, likes, shares, comments };
 };
 
-module.exports = { createPost, getAllPosts, getBonusPoint };
+module.exports = { createPost, getAllPosts, getBonusPoint, getPostsById };

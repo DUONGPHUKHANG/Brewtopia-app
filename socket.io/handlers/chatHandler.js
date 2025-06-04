@@ -4,6 +4,7 @@ module.exports = (socket, io) => {
   socket.on("sendMessage", async ({ chatId, senderId, message }) => {
     try {
       const chatRoom = await ChatRoom.findById(chatId);
+
       if (!chatRoom) {
         socket.emit("error", { message: "Phòng chat không tồn tại" });
         return;

@@ -7,9 +7,11 @@ const {
   createZaloPayPayment,
   getZaloPayPaymentInfo,
   handleZaloPayWebhook,
+  getAllPayments,
 } = require("../controllers/paymentController");
 const { authenticateUser } = require("../middlewares/authMiddleware");
 
+router.post("/", authenticateUser, getAllPayments);
 router.post("/createPayos", authenticateUser, createPayos);
 router.get("/webhook/PayOs", handlePayOshook);
 router.get("/:orderCode", authenticateUser, getPaymentInfo);
