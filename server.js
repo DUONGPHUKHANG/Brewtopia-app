@@ -16,7 +16,12 @@ const server = http.createServer(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true, // Allow credentials
+  })
+);
 
 // Kết nối MongoDB
 mongoose
@@ -58,8 +63,9 @@ app.use("/api/payments", require("./routes/paymentRoutes"));
 app.use("/api/orderMeetingRooms", require("./routes/Orders/MeetingRoomRoutes"));
 app.use("/api/point-Bonus", require("./routes/pointBonusRoutes"));
 app.use("/api/posts", require("./routes/postRoutes"));
-
-// app.use("/api/chat", require("./routes/chatRoutes"));
+app.use("/api/agora", require("./routes/agoraRoutes"));
+app.use("/api/streams", require("./routes/streamRoutes"));
+app.use("/api/chat", require("./routes/chatRoutes"));
 // app.use("/api/aiChat", require("./routes/aiChatRoutes"));
 
 // Khởi động Server

@@ -17,8 +17,8 @@ const createCafe = async (data) => {
 const getAllCafes = async () => {
   return await Cafe.find();
 };
-const getCafeById = async (id) => {
-  return await Cafe.findById(id);
+const getCafeByIdUser = async (id) => {
+  return await Cafe.find({ owner: id });
 };
 
 const updateCafe = async (id, data) => {
@@ -107,7 +107,7 @@ const updateCafeRating = async (cafeId) => {
 module.exports = {
   createCafe,
   getAllCafes,
-  getCafeById,
+  getCafeByIdUser,
   updateCafe,
   deleteCafe,
   // getCafesNearby,

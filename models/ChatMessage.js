@@ -17,4 +17,6 @@ const ChatMessageSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model("ChatMessage", ChatMessageSchema);
+const ChatMessage = mongoose.model("ChatMessage", ChatMessageSchema);
+
+module.exports = ChatMessage;

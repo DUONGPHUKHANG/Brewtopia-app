@@ -1,10 +1,70 @@
+const ChatRoom = require("../../models/ChatRoom");
+
 module.exports = (socket, io) => {
-  socket.on("sendMessage", ({ chatId, senderId, message }) => {
-    io.to(chatId).emit("receiveMessage", { senderId, message });
+  socket.on("sendMessage", async ({ chatId, senderId, message }) => {
+    try {
+      const chatRoom = await ChatRoom.findById(chatId);
+      if (!chatRoom) {
+        socket.emit("error", { message: "Phòng chat không tồn tại" });
+        return;
+      }
+      if (!chatRoom.participants.includes(senderId)) {
+        socket.emit("error", {
+          message: "Bạn không có quyền gửi tin nhắn trong phòng này",
+        });
+        return;
+      }
+      io.to(chatId).emit("receiveMessage", { senderId, message });
+    } catch (error) {
+      socket.emit("error", {
+        message: "Lỗi gửi tin nhắn",
+        error: error.message,
+      });
+    }
   });
 
-  socket.on("joinRoom", (roomId) => {
-    socket.join(roomId);
-    console.log(`User joined room: ${roomId}`);
+  socket.on("joinRoom", async (roomId, userId) => {
+    try {
+      const chatRoom = await ChatRoom.findById(roomId);
+      if (!chatRoom) {
+        socket.emit("error", { message: "Phòng chat không tồn tại" });
+        return;
+      }
+      if (!chatRoom.participants.includes(userId)) {
+        socket.emit("error", {
+          message: "Bạn không được phép tham gia phòng này",
+        });
+        return;
+      }
+      socket.join(roomId);
+      console.log(`User ${userId} joined room: ${roomId}`);
+      io.to(roomId).emit("systemMessage", {
+        message: `Người dùng ${userId} đã tham gia phòng`,
+        type: "join",
+      });
+    } catch (error) {
+      socket.emit("error", {
+        message: "Lỗi tham gia phòng",
+        error: error.message,
+      });
+    }
+  });
+
+  socket.on("leaveRoom", async (roomId, userId) => {
+    try {
+      const chatRoom = await ChatRoom.findById(roomId);
+      if (!chatRoom) {
+        socket.emit("error", { message: "Phòng chat không tồn tại" });
+        return;
+      }
+      socket.leave(roomId);
+      console.log(`User ${userId} left room: ${roomId}`);
+      io.to(roomId).emit("systemMessage", {
+        message: `Người dùng ${userId} đã rời phòng`,
+        type: "leave",
+      });
+    } catch (error) {
+      socket.emit("error", { message: "Lỗi rời phòng", error: error.message });
+    }
   });
 };

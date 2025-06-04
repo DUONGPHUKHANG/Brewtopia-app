@@ -2,6 +2,7 @@ const { Server } = require("socket.io");
 const likeHandler = require("./handlers/likeHandler");
 const shareHandler = require("./handlers/shareHandler");
 const chatHandler = require("./handlers/chatHandler");
+const activeLiveHandler = require("./handlers/activeLiveHandler");
 
 module.exports = (server) => {
   const io = new Server(server, {
@@ -12,10 +13,10 @@ module.exports = (server) => {
     },
   });
 
+  // 🔌 Khi có client kết nối
   io.on("connection", (socket) => {
     console.log("🔗 Client connected:", socket.id);
-
-    // Truyền `socket` và `io` vào các handler
+    activeLiveHandler(socket, io);
     chatHandler(socket, io);
     likeHandler(socket, io);
     shareHandler(socket, io);
@@ -25,5 +26,5 @@ module.exports = (server) => {
     });
   });
 
-  return io; // Trả về `io` để sử dụng trong app
+  return io; // Trả về io để sử dụng tiếp trong app
 };

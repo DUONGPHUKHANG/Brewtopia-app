@@ -31,7 +31,7 @@ const getCafes = async (req, res) => {
 
 const getCafeById = async (req, res) => {
   try {
-    const cafe = await cafeService.getCafeById(req.params.id);
+    const cafe = await cafeService.getCafeByIdUser(req.params.id);
     res.status(200).json(cafe);
   } catch (error) {
     res.status(404).json({ error: error.message });

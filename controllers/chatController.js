@@ -4,12 +4,32 @@ const chatService = require("../services/chatService");
 const createChatRoom = async (req, res) => {
   try {
     const { participants, isGroupChat, name } = req.body;
+
+    // Kiểm tra và xử lý participants cho phòng chat 1:1
+    let finalParticipants = participants;
+    if (!isGroupChat) {
+      // Đảm bảo chỉ có 1 người dùng khác trong participants
+      if (!participants || participants.length !== 1) {
+        return res
+          .status(400)
+          .json({ message: "Phòng chat 1:1 cần đúng 1 userId khác" });
+      }
+      // Thêm ID của người dùng hiện tại vào participants
+      finalParticipants = [req.user.id, ...participants];
+    }
+
+    // Kiểm tra participants có hợp lệ không
+    if (!finalParticipants || finalParticipants.length < 2) {
+      return res.status(400).json({ message: "Cần ít nhất 2 người tham gia" });
+    }
+
     const chatRoomData = {
-      participants,
+      participants: finalParticipants,
       isGroupChat,
-      name: isGroupChat ? name : null, // Với 1:1 chat, không cần tên
-      admin: isGroupChat ? req.user._id : null, // Với group chat, user tạo phòng sẽ là admin
+      name: isGroupChat ? name : null,
+      admin: isGroupChat ? req.user.id : null,
     };
+
     const chatRoom = await chatService.createChatRoom(chatRoomData);
     res.status(201).json(chatRoom);
   } catch (error) {
@@ -35,16 +55,19 @@ const getChatRooms = async (req, res) => {
 const sendMessage = async (req, res) => {
   try {
     const { roomId, message, messageType } = req.body;
+    console.log(roomId, message, messageType);
+
     const messageData = {
       chatRoom: roomId,
-      sender: req.user._id,
+      sender: req.user.id,
       message,
       messageType: messageType || "text",
     };
     const chatMessage = await chatService.sendMessage(messageData);
-    io.to(messageData.chatRoom).emit("receiveMessage", chatMessage);
+    // io.to(messageData.chatRoom).emit("receiveMessage", chatMessage);
     res.status(201).json(chatMessage);
   } catch (error) {
+    const phongdaucac = console.log("ngu như bò");
     res.status(500).json({ message: "Lỗi gửi tin nhắn", error: error.message });
   }
 };

@@ -57,8 +57,13 @@ const getReviewById = async (id) => {
 };
 
 // Lấy danh sách tất cả review
-const getAllReviews = async () => {
-  return await Review.find();
+const getAllReviews = async (cafeId) => {
+  if (!cafeId) {
+    throw new Error("Cafe ID is required");
+  }
+
+  const reviews = await Review.find({ cafeId });
+  return reviews;
 };
 
 // Cập nhật review
@@ -110,9 +115,7 @@ const deleteReview = async (id) => {
 const getReviewsByCafe = async (cafeId) => {
   if (!cafeId) throw new Error("ID quán cafe không được để trống");
   try {
-    const reviews = await Review.find({ cafe: cafeId })
-      .populate("user cafe")
-      .sort({ createdAt: -1 });
+    const reviews = await Review.find({ cafe: cafeId });
     return reviews;
   } catch (error) {
     throw new Error("Lỗi khi lấy review của quán cafe: " + error.message);
