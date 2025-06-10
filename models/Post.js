@@ -5,6 +5,8 @@ const PostSchema = new mongoose.Schema(
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     content: { type: String, required: true },
     images: [String],
+    likeCount: { type: Number, default: 0 },
+    shareCount: { type: Number, default: 0 },
   },
   { timestamps: true, versionKey: false }
 );

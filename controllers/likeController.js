@@ -25,7 +25,7 @@ const likeOrUnlikes = async (req, res) => {
 const getLikes = async (req, res) => {
   try {
     const { id: targetId } = req.params;
-    const { targetModel } = req.query;
+    const { targetModel } = req.body;
 
     if (!targetModel) {
       return res.status(400).json({ message: "Thiếu targetModel" });
