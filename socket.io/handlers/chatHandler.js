@@ -1,8 +1,11 @@
 const ChatRoom = require("../../models/ChatRoom");
+const ChatMessage = require("../../models/ChatMessage");
 
 module.exports = (socket, io) => {
   socket.on("sendMessage", async ({ chatId, senderId, message }) => {
     try {
+      console.log(chatId, senderId, message);
+
       const chatRoom = await ChatRoom.findById(chatId);
 
       if (!chatRoom) {
@@ -15,7 +18,21 @@ module.exports = (socket, io) => {
         });
         return;
       }
-      io.to(chatId).emit("receiveMessage", { senderId, message });
+
+      // **Lưu tin nhắn vào DB**
+      const chatMessage = await ChatMessage.create({
+        chatRoom: chatId,
+        sender: senderId,
+        message,
+      });
+
+      // Gửi lại cho các client khác
+      io.to(chatId).emit("receiveMessage", {
+        _id: chatMessage._id,
+        chatRoom: chatMessage.chatRoom,
+        sender: chatMessage.sender,
+        message: chatMessage.message,
+      });
     } catch (error) {
       socket.emit("error", {
         message: "Lỗi gửi tin nhắn",
@@ -23,9 +40,10 @@ module.exports = (socket, io) => {
       });
     }
   });
-
   socket.on("joinRoom", async (roomId, userId) => {
     try {
+      console.log(roomId, userId);
+
       const chatRoom = await ChatRoom.findById(roomId);
       if (!chatRoom) {
         socket.emit("error", { message: "Phòng chat không tồn tại" });
