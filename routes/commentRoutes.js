@@ -8,7 +8,7 @@ const { authenticateUser } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
-router.get("/", getComments);
+router.post("/allComment", getComments);
 router.post("/", authenticateUser, createComment);
 router.delete("/:id", authenticateUser, deleteComment);
 

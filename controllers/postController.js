@@ -46,6 +46,7 @@ const getPosts = async (req, res) => {
 const getPostsByIds = async (req, res) => {
   try {
     const user = req.user.id;
+    console.log(user);
     const { page = 1, limit = 10 } = req.query;
     const postsData = await getPostsById(user, parseInt(page), parseInt(limit));
     return res
