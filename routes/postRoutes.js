@@ -19,7 +19,7 @@ router.post(
 );
 // router.get("/", authenticateUser, getPosts);
 router.get("/", authenticateUser, getPostsByIds);
-
+router.get("/allPost", authenticateUser, getPosts);
 router.get("/points", authenticateUser, getPointBonus);
 
 module.exports = router;

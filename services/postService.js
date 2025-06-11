@@ -23,11 +23,12 @@ const getAllPosts = async (page = 1, limit = 10) => {
   try {
     const skip = (page - 1) * limit;
     const posts = await Post.find()
-      .populate("user", "-password")
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 })
       .lean();
+
+    console.log(posts);
 
     const postsWithCounts = await Promise.all(
       posts.map(async (post) => {

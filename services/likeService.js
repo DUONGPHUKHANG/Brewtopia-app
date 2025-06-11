@@ -12,7 +12,7 @@ const likeOrUnlike = async (userId, targetId, targetModel, io) => {
     target: targetId,
     targetModel,
   });
-  console.log(existingLike);
+  // console.log(existingLike);
 
   if (existingLike) {
     // Nếu đã like thì unlike (xóa like)
