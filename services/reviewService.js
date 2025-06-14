@@ -57,12 +57,12 @@ const getReviewById = async (id) => {
 };
 
 // Lấy danh sách tất cả review
-const getAllReviews = async (cafeId) => {
-  if (!cafeId) {
-    throw new Error("Cafe ID is required");
-  }
+const getAllReviews = async () => {
+  // if (!cafeId) {
+  //   throw new Error("Cafe ID is required");
+  // }
 
-  const reviews = await Review.find({ cafeId });
+  const reviews = await Review.find();
   return reviews;
 };
 

@@ -41,6 +41,27 @@ const getComments = async (req, res) => {
   }
 };
 
+const getCmtsToPost = async (req, res) => {
+  try {
+    const { targetId, targetType } = req.body;
+
+    if (!targetId || !targetType) {
+      return res
+        .status(400)
+        .json({ message: "Thiếu targetId hoặc targetType" });
+    }
+
+    const comments = await commentService.getCommentsByTarget(
+      targetId,
+      targetType
+    );
+    res.json(comments);
+  } catch (error) {
+    console.error("❌ Lỗi khi lấy bình luận:", error);
+    res.status(500).json({ message: "Lỗi server khi lấy bình luận" });
+  }
+};
+
 const deleteComment = async (req, res) => {
   try {
     const { id } = req.params;
