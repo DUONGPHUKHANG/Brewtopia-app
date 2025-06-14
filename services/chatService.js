@@ -29,4 +29,17 @@ const getMessages = async (roomId) => {
     .sort({ createdAt: 1 });
   return messages;
 };
-module.exports = { createChatRoom, getChatRooms, sendMessage, getMessages };
+
+const findOneToOneRoom = async (userIdA, userIdB) => {
+  return await ChatRoom.findOne({
+    isGroupChat: false,
+    participants: { $all: [userIdA, userIdB], $size: 2 },
+  });
+};
+module.exports = {
+  createChatRoom,
+  getChatRooms,
+  sendMessage,
+  getMessages,
+  findOneToOneRoom,
+};

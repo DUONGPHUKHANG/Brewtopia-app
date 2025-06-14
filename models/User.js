@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema(
     verificationCode: String,
     isVerified: { type: Boolean, default: false },
     role: { type: String, enum: ["user", "admin"], default: "user" },
+    AccStatus: { type: String, default: false },
     provider: {
       type: String,
       enum: ["local", "google", "facebook"],

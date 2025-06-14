@@ -2,12 +2,13 @@ const PayOS = require("@payos/node");
 const { clientId, apiKey, checksumKey } = require("../config/payos");
 const { appId, key1, key2, endpoint } = require("../config/zalopay");
 const Payment = require("../models/Payment");
+const User = require("../models/User");
 const payos = new PayOS(clientId, apiKey, checksumKey);
 
 // 🏡 Tạo quán cafe mới
 
 const createPayOsLink = async (orderData) => {
-  const { userId, amount } = orderData;
+  const { userId, amount, targetModel } = orderData;
 
   const orderCodeGene = Math.floor(Date.now() / 10000);
   const description = `Order ID ${orderCodeGene}`;
@@ -16,6 +17,8 @@ const createPayOsLink = async (orderData) => {
     user: userId,
     amount,
     orderCode: orderCodeGene,
+    description,
+    targetModel, // <- quan trọng!
   });
 
   const paymentData = {
@@ -31,27 +34,37 @@ const createPayOsLink = async (orderData) => {
   await payment.save();
   return paymentLink;
 };
-
+const upgradeHandlers = {
+  UpgradePremium: async (userId) => {
+    await User.findByIdAndUpdate(userId, { AccStatus: "Premium" });
+  },
+  UpgradeVIP: async (userId) => {
+    await User.findByIdAndUpdate(userId, { AccStatus: "VIP" });
+  },
+  PointPurchase: async (userId, payment) => {
+    await User.findByIdAndUpdate(userId, { $inc: { points: payment.amount } });
+  },
+  // ...add more as you wish
+};
 const confirmWebhook = async (webhookUrl) => {
   return await payos.confirmWebhook(webhookUrl);
 };
 const handlePayOSWebhook = async (webhookData) => {
-  // const webhookUrl = process.env.PAYOS_WEBHOOK_URL;
-  // const isValid = await confirmWebhook(webhookUrl);
-  // console.log(isValid);
-
-  // if (!isValid) {
-  //   throw new Error("Invalid PayOS webhook");
-  // }
-
   const { orderCode, status } = webhookData;
-  const payment = await Payment.findOne({ orderCode: orderCode });
-  if (!payment) {
-    throw new Error("Payment not found");
-  }
+  const payment = await Payment.findOne({ orderCode });
+  if (!payment) throw new Error("Payment not found");
 
   payment.status = status === "PAID" ? "PAID" : "CANCELLED";
   await payment.save();
+
+  if (payment.status === "PAID") {
+    // Tìm handler tương ứng
+    const handler = upgradeHandlers[payment.targetModel];
+    if (handler) {
+      await handler(payment.user, payment); // truyền userId, payment object
+    }
+  }
+
   return payment;
 };
 const getPayOsInfo = async (orderCode) => {

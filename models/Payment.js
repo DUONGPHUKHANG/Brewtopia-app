@@ -6,19 +6,14 @@ const PaymentSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  // target: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   required: true,
-  //   refPath: "targetModel",
-  // },
   orderCode: { type: Number, require: true, unique: true },
   amount: { type: Number, required: true },
   description: { type: String, require: true },
   paymentLinkId: { type: String },
   targetModel: {
     type: String,
-    enum: ["OrderMeetingRoom", "PointPurchase"],
-    //đang test chưa dùng vì liên quan tới thanh toán cho đặt phòng hoặc point
+    enum: ["UpgradePremium", "UpgradeVIP", "PointPurchase"], // Có thể thêm nữa
+    required: true,
   },
   status: {
     type: String,
@@ -27,7 +22,7 @@ const PaymentSchema = new mongoose.Schema({
   },
   Provider: {
     type: String,
-    enum: ["Momo", "Vnpay", "Payos", "Paypal"],
+    enum: ["Momo", "Vnpay", "Payos", "Paypal", "ZaloPay"],
     default: "Payos",
   },
   currency: {

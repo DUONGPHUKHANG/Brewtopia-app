@@ -1,3 +1,4 @@
+const { log } = require("winston");
 const payment = require("../models/Payment");
 const {
   createPayOsLink,
@@ -22,14 +23,16 @@ const getAllPayments = async (req, res) => {
 const createPayos = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { amount } = req.body;
-    if (!amount) {
+    const { amount, targetModel } = req.body;
+
+    if (!amount || !targetModel) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
     const paymentLink = await createPayOsLink({
       userId,
       amount,
+      targetModel,
     });
 
     res.status(200).json({

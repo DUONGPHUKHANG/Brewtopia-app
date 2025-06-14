@@ -42,9 +42,9 @@ module.exports = (socket, io) => {
   });
   socket.on("joinRoom", async (roomId, userId) => {
     try {
-      console.log(roomId, userId);
-
       const chatRoom = await ChatRoom.findById(roomId);
+      console.log(chatRoom);
+
       if (!chatRoom) {
         socket.emit("error", { message: "Phòng chat không tồn tại" });
         return;
@@ -62,6 +62,7 @@ module.exports = (socket, io) => {
         type: "join",
       });
     } catch (error) {
+      console.log(error);
       socket.emit("error", {
         message: "Lỗi tham gia phòng",
         error: error.message,

@@ -20,6 +20,6 @@ router.post("/room", authenticateUser, createChatRoom);
 router.post("/message", authenticateUser, sendMessage);
 
 // Lấy lịch sử tin nhắn theo phòng chat
-router.get("/message/:roomId", authenticateUser, getMessages);
+router.get("/message/:roomId", getMessages);
 
 module.exports = router;
