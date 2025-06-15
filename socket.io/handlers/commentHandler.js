@@ -3,6 +3,7 @@ const commentService = require("../../services/commentService");
 module.exports = (socket, io) => {
   socket.on("comment:create", async (data) => {
     const { targetId, targetType, content, userId } = data;
+    console.log(data);
 
     try {
       const newComment = await commentService.createComment(
