@@ -11,7 +11,7 @@ const {
 
 const getAllPayments = async (req, res) => {
   try {
-    const paymentLink = await payment.find({ user: req.user.id });
+    const paymentLink = await payment.find();
     res.status(200).json({
       message: "PayOs link created successfully",
       data: paymentLink,
