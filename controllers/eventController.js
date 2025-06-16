@@ -6,6 +6,7 @@ const {
   getEvent,
   followEvent,
   unfollowEvent,
+  toggleFollowEvent,
 } = require("../services/eventService");
 
 const createEvent = async (req, res) => {
@@ -100,8 +101,20 @@ const deleteEvent = async (req, res) => {
       .json({ message: "Lỗi khi xóa sự kiện", error: error.message });
   }
 };
-
+const toggleFollowEvents = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const eventId = req.params.id;
+    const event = await toggleFollowEvent(eventId, userId);
+    res.status(200).json({ message: "Toggle follow thành công", event });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Lỗi khi toggle follow sự kiện", error: error.message });
+  }
+};
 module.exports = {
+  toggleFollowEvents,
   createEvent,
   getEvents,
   getEventById,

@@ -4,6 +4,7 @@ const shareHandler = require("./handlers/shareHandler");
 const chatHandler = require("./handlers/chatHandler");
 const activeLiveHandler = require("./handlers/activeLiveHandler");
 const commentHandler = require("./handlers/commentHandler");
+const followEventHandler = require("./handlers/followEventHandler");
 
 module.exports = (server) => {
   const io = new Server(server, {
@@ -19,6 +20,7 @@ module.exports = (server) => {
   io.on("connection", (socket) => {
     console.log("🔗 Client connected:", socket.id);
     activeLiveHandler(socket, io);
+    followEventHandler(socket, io);
     chatHandler(socket, io);
     commentHandler(socket, io);
     likeHandler(socket, io);

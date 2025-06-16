@@ -20,6 +20,29 @@ const getAllPayments = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const getHisPayments = async (req, res) => {
+  try {
+    const paymentLink = await payment.find({ user: req.user.id });
+    res.status(200).json({
+      message: "PayOs link created successfully",
+      data: paymentLink,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+const findOrderCode = async (req, res) => {
+  try {
+    const { code } = req.params;
+    const paymentLink = await payment.find({ orderCode: code });
+    res.status(200).json({
+      message: "PayOs link created successfully",
+      data: paymentLink,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 const createPayos = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -120,6 +143,8 @@ module.exports = {
   createPayos,
   handlePayOshook,
   getPaymentInfo,
+  getHisPayments,
+  findOrderCode,
   createZaloPayPayment,
   handleZaloPayWebhook,
   getZaloPayPaymentInfo,

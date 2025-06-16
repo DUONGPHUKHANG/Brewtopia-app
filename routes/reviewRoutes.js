@@ -20,7 +20,12 @@ router.post(
   uploadFields("reviews-images", [{ name: "images", maxCount: 2 }]),
   createReview
 );
-router.put("/:id", authenticateUser, updateReview);
+router.put(
+  "/:id",
+  authenticateUser,
+  uploadFields("reviews-images", [{ name: "images", maxCount: 2 }]),
+  updateReview
+);
 router.delete("/:id", authenticateUser, deleteReview);
 router.post("/cafe/:cafeId", getReviewsByCafe);
 

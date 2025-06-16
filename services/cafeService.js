@@ -87,8 +87,8 @@ const updateCafeRating = async (cafeId) => {
       reviewCount,
       reviews: validReviews.map((r) => r._id),
     });
-    console.log("Valid Reviews:", validReviews);
-    console.log("Avg Rating:", averageRating);
+    // console.log("Valid Reviews:", validReviews);
+    // console.log("Avg Rating:", averageRating);
   } catch (err) {
     console.error("Lỗi khi cập nhật rating:", err);
     throw new Error("Lỗi khi cập nhật rating: " + err.message);

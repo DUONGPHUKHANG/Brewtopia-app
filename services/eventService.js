@@ -93,8 +93,22 @@ const delEvent = async (id) => {
     throw new Error("Không thể xóa sự kiện");
   }
 };
-
+const toggleFollowEvent = async (eventId, userId) => {
+  const event = await Event.findById(eventId);
+  if (!event) throw new Error("Sự kiện không tồn tại");
+  const isFollowing = event.followers.includes(userId);
+  if (isFollowing) {
+    event.followers = event.followers.filter(
+      (id) => id.toString() !== userId.toString()
+    );
+  } else {
+    event.followers.push(userId);
+  }
+  await event.save();
+  return event;
+};
 module.exports = {
+  toggleFollowEvent,
   creEvent,
   getEventAll,
   getEvent,

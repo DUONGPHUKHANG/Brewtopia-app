@@ -70,11 +70,24 @@ const getAllReviews = async () => {
 const updateReview = async (id, updateData) => {
   if (!id) throw new Error("ID review không được để trống");
   try {
-    const updatedReview = await Review.findByIdAndUpdate(id, updateData, {
-      new: true,
-      runValidators: true,
-    }).populate("user cafe");
+    // Lấy review cũ để biết cafeId
+    const oldReview = await Review.findById({ _id: id });
+    const updatedReview = await Review.findByIdAndUpdate(
+      { _id: id },
+      updateData,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
     if (!updatedReview) throw new Error("Không tìm thấy review với ID: " + id);
+
+    // Nếu rating thay đổi hoặc luôn muốn update lại
+    if (oldReview.rating !== updateData.rating) {
+      await updateCafeRating(oldReview.cafe);
+    }
+
     return updatedReview;
   } catch (err) {
     throw new Error("Lỗi khi cập nhật review: " + err.message);
