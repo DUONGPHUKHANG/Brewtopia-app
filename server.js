@@ -23,7 +23,7 @@ app.use(
     credentials: true, // Allow credentials
   })
 );
-
+const path = require("path");
 // Kết nối MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
@@ -67,6 +67,9 @@ app.use("/api/posts", require("./routes/postRoutes"));
 app.use("/api/agora", require("./routes/agoraRoutes"));
 app.use("/api/streams", require("./routes/streamRoutes"));
 app.use("/api/chat", require("./routes/chatRoutes"));
+app.get("/test", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html")); // hoặc đổi thành tên file bạn đặt
+});
 // app.use("/api/aiChat", require("./routes/aiChatRoutes"));
 
 // Khởi động Server

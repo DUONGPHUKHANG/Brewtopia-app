@@ -5,17 +5,19 @@ module.exports = (socket, io) => {
     try {
       const event = await eventService.toggleFollowEvent(eventId, userId);
 
-      // Kiểm tra userId hiện tại đã có trong followers chưa
+      // Kiểm tra trạng thái sau khi toggle
       const isFollowing = event.followers
         .map((id) => id.toString())
         .includes(userId);
 
+      // Gửi cập nhật số lượng follower cho tất cả client
       io.emit("follow:update", {
         eventId,
-        followChange: isFollowing ? 1 : -1, // Nếu sau toggle là follow thì +1, unfollow thì -1
+        followChange: isFollowing ? 1 : -1, // Nếu là follow thì +1, unfollow thì -1
         followersCount: event.followers.length,
       });
 
+      // Gửi thông báo riêng cho client đã thực hiện hành động
       socket.emit("follow:response", {
         message: isFollowing ? "Đã follow" : "Đã unfollow",
         eventId,

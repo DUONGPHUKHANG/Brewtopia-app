@@ -1,5 +1,6 @@
 const LiveHistory = require("../../models/LiveHistory");
 const ChatStream = require("../../models/ChatStream");
+const ChatMessage = require("../../models/ChatMessage");
 const User = require("../../models/User");
 
 module.exports = (socket, io) => {

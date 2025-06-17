@@ -7,13 +7,13 @@ const creEvent = async (eventData) => {
   }
 
   // Tạo object sự kiện mới
-  const newEvent = {
-    ...eventData,
-    followers: [],
-  };
 
-  // Tạo sự kiện trong database
-  const event = await Event.create(newEvent);
+  const event = await Event.create({
+    ...eventData,
+    cafe: eventData.cafeId,
+    followers: [],
+  });
+
   return event;
 };
 
@@ -66,7 +66,9 @@ const unfollowEvent = async (eventId, userId) => {
 };
 const getEvent = async (id) => {
   try {
-    const event = await Event.findById(id);
+    console.log(id);
+
+    const event = await Cafes.find(id);
     if (!event) throw new Error("Sự kiện không tồn tại");
     return event;
   } catch (error) {
@@ -104,9 +106,12 @@ const toggleFollowEvent = async (eventId, userId) => {
   } else {
     event.followers.push(userId);
   }
+  // Cập nhật lại trường Countfollower
+  event.Countfollower = event.followers.length;
   await event.save();
   return event;
 };
+
 module.exports = {
   toggleFollowEvent,
   creEvent,

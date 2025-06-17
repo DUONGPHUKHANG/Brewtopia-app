@@ -1,15 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const {
-  getActive,
+  startLives,
+  endLives,
   getHistory,
-  endStream,
 } = require("../controllers/streamController");
 const { authenticateUser } = require("../middlewares/authMiddleware");
 const { authorizeRoles } = require("../middlewares/roleMiddleware");
 
-router.get("/active", authenticateUser, authorizeRoles(["admin"]), getActive);
-router.get("/history", authenticateUser, authorizeRoles(["admin"]), getHistory);
-router.post("/end", authenticateUser, authorizeRoles(["admin"]), endStream);
+router.get("/start", startLives);
+router.get("/history", getHistory);
+router.post("/end", endLives);
 
 module.exports = router;

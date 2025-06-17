@@ -3,11 +3,9 @@ const { generateToken } = require("../services/agoraService");
 const getToken = (req, res) => {
   const { channelName, uid = 0, role = "publisher" } = req.body;
   if (!channelName) {
-    console.log(channelName);
     return res.status(400).json({ error: "channelName is required" });
   }
   try {
-    console.log(channelName);
     const token = generateToken(channelName, uid, role);
     return res.json({ appId: process.env.AGORA_APP_ID, token, uid });
   } catch (err) {

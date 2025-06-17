@@ -4,5 +4,5 @@ const { getToken } = require("../controllers/agoraController");
 const { authenticateUser } = require("../middlewares/authMiddleware");
 const { authorizeRoles } = require("../middlewares/roleMiddleware");
 
-router.post("/token", authenticateUser, authorizeRoles(["admin"]), getToken);
+router.post("/token", getToken);
 module.exports = router;

@@ -42,6 +42,7 @@ module.exports = (socket, io) => {
   });
   socket.on("joinRoom", async (roomId, userId) => {
     try {
+      log;
       const chatRoom = await ChatRoom.findById(roomId);
       console.log(chatRoom);
 

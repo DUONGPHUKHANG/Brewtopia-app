@@ -1,18 +1,30 @@
 const {
-  getActives,
+  startLive,
   getHistorys,
-  endStreams,
+  endLive,
 } = require("../services/streamService");
 
-const getActive = async (req, res) => {
+// Bắt đầu live
+const startLives = async (req, res) => {
   try {
-    const all = await getActives();
-    res.status(200).json({ message: "tìm thấy thành công", data: all });
-  } catch (error) {
-    res.status(500).json({ message: "Lỗi server", error: error.message });
+    const { channelId, hostId, title } = req.body;
+    const live = await startLive(channelId, hostId, title);
+    res.status(200).json({ message: "Bắt đầu live thành công", data: live });
+  } catch (err) {
+    res.status(500).json({ message: "Lỗi server", error: err.message });
   }
 };
 
+// Kết thúc live
+const endLives = async (req, res) => {
+  try {
+    const { channelId } = req.body;
+    const live = await endLive(channelId);
+    res.status(200).json({ message: "Kết thúc live thành công", data: live });
+  } catch (err) {
+    res.status(500).json({ message: "Lỗi server", error: err.message });
+  }
+};
 const getHistory = async (req, res) => {
   try {
     const all = await getHistorys();
@@ -21,16 +33,4 @@ const getHistory = async (req, res) => {
     res.status(500).json({ message: "Lỗi server", error: error.message });
   }
 };
-
-const endStream = async (req, res) => {
-  try {
-    const channelId = req.body.channelId;
-    const all = await endStreams(channelId);
-    res
-      .status(200)
-      .json({ message: "kết thúc buổi live thành công", data: all });
-  } catch (error) {
-    res.status(500).json({ message: "Lỗi server", error: error.message });
-  }
-};
-module.exports = { getActive, getHistory, endStream };
+module.exports = { startLives, getHistory, endLives };
