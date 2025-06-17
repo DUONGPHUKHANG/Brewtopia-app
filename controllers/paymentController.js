@@ -7,8 +7,8 @@ const {
   createZaloPay,
   handleZaloWebhook,
   getZaloPayInfo,
-  paginate,
 } = require("../services/paymentService");
+const paginate = require("../utils/paginate");
 
 const getAllPayments = async (req, res) => {
   try {

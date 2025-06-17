@@ -28,8 +28,6 @@ const getAllPosts = async (page = 1, limit = 10) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    console.log(posts);
-
     const postsWithCounts = await Promise.all(
       posts.map(async (post) => {
         const [likeCount, shareCount, commentCount] = await Promise.all([

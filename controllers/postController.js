@@ -1,9 +1,11 @@
+const Post = require("../models/Post");
 const {
   createPost,
   getBonusPoint,
   getAllPosts,
   getPostsById,
 } = require("../services/postService");
+const paginate = require("../utils/paginate");
 
 const createPostSocial = async (req, res) => {
   try {
@@ -33,20 +35,29 @@ const getPointBonus = async (req, res) => {
 
 const getPosts = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const postsData = await getAllPosts(parseInt(page), parseInt(limit));
-    return res
-      .status(200)
-      .json({ message: "Posts retrieved successfully", ...postsData });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const { results, total, totalPages } = await paginate(
+      Post,
+      {},
+      page,
+      limit
+    );
+    res.status(200).json({
+      message: "lấy danh sách bài viết thành công",
+      data: results,
+      total,
+      page,
+      totalPages,
+    });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
 const getPostsByIds = async (req, res) => {
   try {
     const user = req.user.id;
-    console.log(user);
     const { page = 1, limit = 10 } = req.query;
     const postsData = await getPostsById(user, parseInt(page), parseInt(limit));
     return res
