@@ -7,14 +7,25 @@ const {
   createZaloPay,
   handleZaloWebhook,
   getZaloPayInfo,
+  paginate,
 } = require("../services/paymentService");
 
 const getAllPayments = async (req, res) => {
   try {
-    const paymentLink = await payment.find();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const { results, total, totalPages } = await paginate(
+      payment,
+      {},
+      page,
+      limit
+    );
     res.status(200).json({
-      message: "PayOs link created successfully",
-      data: paymentLink,
+      message: "Lấy danh sách giao dịch thành công",
+      data: results,
+      total,
+      page,
+      totalPages,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

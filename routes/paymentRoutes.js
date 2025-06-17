@@ -13,7 +13,7 @@ const {
 } = require("../controllers/paymentController");
 const { authenticateUser } = require("../middlewares/authMiddleware");
 
-router.get("/", authenticateUser, getAllPayments);
+router.get("/", getAllPayments);
 router.post("/hisPayments", authenticateUser, getHisPayments);
 router.get("/findOrderCode/:code", authenticateUser, findOrderCode);
 router.post("/createPayos", authenticateUser, createPayos);
